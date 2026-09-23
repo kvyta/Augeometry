@@ -1008,9 +1008,10 @@ var TIERS = { 1: 'Warm-up', 2: 'AIME', 3: 'Olympiad config', 4: 'Wild' };
 
 function byId(id) { for (var i = 0; i < CONFIGS.length; i++) if (CONFIGS[i].id === id) return CONFIGS[i]; return null; }
 
-var DEFAULT_CAP = 2000000n;
+var DEFAULT_CAP = 60000n;
 function acceptable(v, cfg) {
   if (v.n <= 0n) return false;
+  if (v.n + v.d < 8n) return false;      /* single-digit answers are guessable */
   var cap = cfg && cfg.cap ? BigInt(cfg.cap) : DEFAULT_CAP;
   if (v.n + v.d > cap) return false;
   return true;
@@ -1021,14 +1022,22 @@ function makeProblem(cfgId, seed) {
   var cfg = byId(cfgId);
   if (!cfg) return null;
   var R = rng(seed >>> 0);
-  var p = null, v = null;
-  for (var k = 0; k < 400; k++) {
-    p = cfg.gen(R);
-    try { v = cfg.value(p); } catch (e) { continue; }
-    if (acceptable(v, cfg)) break;
-    v = null;
+  var p = null, v = null, pool = [];
+  /* Sample many instances and keep one of the cleanest: the same lemma can land on
+     13/4 or on 826281/23104 depending only on the side lengths, and the second is
+     a bash, not a geometry problem. */
+  for (var k = 0; k < 300 && pool.length < 60; k++) {
+    var pk = cfg.gen(R), vk;
+    try { vk = cfg.value(pk); } catch (e) { continue; }
+    if (!acceptable(vk, cfg)) continue;
+    pool.push({ p: pk, v: vk, s: 2.4 * Math.log(Number(vk.d) + 1) + Math.log(Number(vk.n) + 1) });
   }
-  if (!v) { p = cfg.gen(rng(12345)); v = cfg.value(p); }
+  if (pool.length) {
+    pool.sort(function (x, y) { return x.s - y.s; });
+    var take = pool.slice(0, Math.min(12, pool.length));
+    var ch = take[Math.floor(R() * take.length)];
+    p = ch.p; v = ch.v;
+  } else { p = cfg.gen(rng(12345)); v = cfg.value(p); }
   var isInt = fint(v);
   var answer = isInt ? v.n : (v.n + v.d);
   var ask = isInt

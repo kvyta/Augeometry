@@ -337,6 +337,8 @@ var MOVES = [
   { id: 'radmeet', w: 7, go: function (ctx, R) {
       if (ctx.circs.length < 2) return null;
       var s = some(R, ctx.circs, 2); if (!s) return null;
+      var shared = s[0].on.filter(function (n) { return s[1].on.indexOf(n) >= 0; });
+      if (shared.length >= 2) return null;      /* then it is just the common chord */
       var ax = radAxis(s[0].c, s[1].c); if (!ax) return null;
       var pp = some(R, ctx.pts, 2); if (!pp) return null;
       var l = linePP(pp[0].p, pp[1].p); if (!l) return null;
@@ -582,6 +584,13 @@ function eqClasses(ctx) {
 }
 
 function expandKnown(ctx) {
+  ctx.ops.forEach(function (o) {
+    if (o.id !== 'rad') return;
+    var c1 = nameC(ctx, o.cc[0]), c2 = nameC(ctx, o.cc[1]);
+    if (!c1 || !c2) return;
+    var sh = c1.on.filter(function (n) { return c2.on.indexOf(n) >= 0; });
+    if (sh.length >= 2) addColl(ctx, [sh[0], sh[1], o.out]);
+  });
   /* a reflection in a line preserves the distance from every point of that line */
   ctx.ops.forEach(function (o) {
     if (o.id !== 'reflL') return;
@@ -680,39 +689,80 @@ function findNotes(ctx) {
   return notes.slice(0, 3);
 }
 
-/* ---------- targets ---------- */
-function chooseTarget(ctx, R) {
-  var P = ctx.pts, late = P.slice(3), tries = 0;
-  var base = ['A', 'B', 'C'];
-  while (tries++ < 160) {
-    var roll = R();
-    if (roll < 0.70 && late.length) {
-      var X = late[rint(R, late.length)];
-      var pool = P.filter(function (q) { return q.n !== X.n; });
-      var Y = pool[rint(R, pool.length)];
-      var v = dd(X.p, Y.p);
-      if (qz(v)) continue;
-      return { v: v, q: X.n + Y.n + '²', kind: 'd2', pts: [X.n, Y.n] };
-    } else if (roll < 0.88) {
-      var s = some(R, P, 3); if (!s) continue;
-      var ar = areaX2(s[0].p, s[1].p, s[2].p);
-      if (qz(ar)) continue;
-      var base2 = areaX2(nameP(ctx, 'A').p, nameP(ctx, 'B').p, nameP(ctx, 'C').p);
-      if (s.every(function (z) { return base.indexOf(z.n) >= 0; })) continue;
-      return { v: qd(ar, base2), q: '[' + s[0].n + s[1].n + s[2].n + '] / [ABC]', kind: 'area', pts: [s[0].n, s[1].n, s[2].n] };
-    } else if (roll < 0.94 && ctx.circs.length > 1) {
-      var ce = ctx.circs[1 + rint(R, ctx.circs.length - 1)];
-      return { v: ce.c.r2, q: 'the square of the radius of ' + ce.n, kind: 'r2', circ: ce.n };
-    } else if (late.length >= 2) {
-      var s1 = some(R, late, 2), s2 = some(R, P, 2);
-      if (!s1 || !s2) continue;
-      var n1 = dd(s1[0].p, s1[1].p), n2 = dd(s2[0].p, s2[1].p);
-      if (qz(n1) || qz(n2) || (s1[0].n === s2[0].n && s1[1].n === s2[1].n)) continue;
-      return { v: qd(n1, n2), q: s1[0].n + s1[1].n + '² / ' + s2[0].n + s2[1].n + '²', kind: 'ratio',
-               pts: [s1[0].n, s1[1].n, s2[0].n, s2[1].n] };
-    }
+/* ---------- targets ----------
+   Enumerate every candidate question this construction can ask, then keep the one
+   with the cleanest exact value. A big denominator is the signature of a bash
+   problem; a small one means the quantity actually has structure.               */
+function depCount(ctx, names, circName) {
+  var need = {}, cnt = 0;
+  names.forEach(function (n) { need[n] = 1; });
+  if (circName) need[circName] = 1;
+  for (var i = ctx.ops.length - 1; i >= 0; i--) {
+    var op = ctx.ops[i];
+    if (!need[op.out]) continue;
+    if (op.id !== 'omegaSeed') cnt++;
+    (op.a || []).forEach(function (n) { need[n] = 1; });
+    if (op.c) need[op.c] = 1;
+    if (op.cc) op.cc.forEach(function (n) { need[n] = 1; });
   }
-  return null;
+  return cnt;
+}
+/* per-kind cleanliness budgets: a squared length carries a squarer denominator
+   than an area ratio, so holding both to one threshold just deletes all lengths */
+var CAPS = { d2: [900n, 40000n], area: [250n, 20000n], ratio: [150n, 12000n], r2: [900n, 40000n] };
+function scoreOf(v, kept) {
+  var num = Number(v.n), den = Number(v.d);
+  return 2.4 * Math.log(den + 1) + Math.log(num + 1) - 0.85 * kept;
+}
+function chooseTarget(ctx, R) {
+  var P = ctx.pts, i, j, k, cands = [];
+  var isBase = function (n) { return n === 'A' || n === 'B' || n === 'C'; };
+  var push = function (v, q, kind, names, circ) {
+    if (!v || v.n <= 0n) return;
+    var cap = CAPS[kind];
+    if (v.d > cap[0]) return;
+    if (v.n + v.d > cap[1]) return;
+    if (v.n + v.d < 15n) return;          /* an answer of 1 or 2 is a giveaway */
+    var kept = depCount(ctx, names || [], circ);
+    if (kept < 4) return;
+    cands.push({ v: v, q: q, kind: kind, pts: names, circ: circ, kept: kept, s: scoreOf(v, kept) });
+  };
+  var baseArea = areaX2(nameP(ctx, 'A').p, nameP(ctx, 'B').p, nameP(ctx, 'C').p);
+
+  for (i = 0; i < P.length; i++) for (j = i + 1; j < P.length; j++) {
+    if (isBase(P[i].n) && isBase(P[j].n)) continue;
+    push(dd(P[i].p, P[j].p), P[i].n + P[j].n + '\u00B2', 'd2', [P[i].n, P[j].n]);
+  }
+  for (i = 0; i < P.length; i++) for (j = i + 1; j < P.length; j++) for (k = j + 1; k < P.length; k++) {
+    if (isBase(P[i].n) && isBase(P[j].n) && isBase(P[k].n)) continue;
+    var ar = areaX2(P[i].p, P[j].p, P[k].p);
+    if (qz(ar)) continue;
+    push(qd(ar, baseArea), '[' + P[i].n + P[j].n + P[k].n + '] / [ABC]', 'area', [P[i].n, P[j].n, P[k].n]);
+  }
+  for (i = 1; i < ctx.circs.length; i++) {
+    push(ctx.circs[i].c.r2, 'the square of the radius of ' + ctx.circs[i].n, 'r2', [], ctx.circs[i].n);
+  }
+  var late = P.filter(function (z) { return !isBase(z.n); });
+  for (var t = 0; t < 40 && late.length >= 2; t++) {
+    var s1 = some(R, late, 2), s2 = some(R, P, 2);
+    if (!s1 || !s2) continue;
+    if (segKey(s1[0].n, s1[1].n) === segKey(s2[0].n, s2[1].n)) continue;
+    var n1 = dd(s1[0].p, s1[1].p), n2 = dd(s2[0].p, s2[1].p);
+    if (qz(n1) || qz(n2)) continue;
+    var rv = qd(n1, n2);
+    push(rv, s1[0].n + s1[1].n + '\u00B2 / ' + s2[0].n + s2[1].n + '\u00B2', 'ratio',
+         [s1[0].n, s1[1].n, s2[0].n, s2[1].n]);
+  }
+  if (!cands.length) return null;
+  cands.sort(function (x, y) { return x.s - y.s; });
+  var byKind = {}, KW = { d2: 55, area: 26, ratio: 14, r2: 5 };
+  cands.forEach(function (c2) { (byKind[c2.kind] = byKind[c2.kind] || []).push(c2); });
+  var kinds = Object.keys(byKind), tot = 0;
+  kinds.forEach(function (k2) { tot += KW[k2] || 1; });
+  var r = R() * tot, pickKind = kinds[0];
+  for (var z = 0; z < kinds.length; z++) { r -= (KW[kinds[z]] || 1); if (r <= 0) { pickKind = kinds[z]; break; } }
+  var pool = byKind[pickKind].slice(0, Math.min(6, byKind[pickKind].length));
+  return pool[rint(R, pool.length)];
 }
 
 /* ---------- the generator ---------- */
@@ -806,8 +856,6 @@ function build(seed) {
   if (verifyCtx(ctx)) return null;
   var tg = chooseTarget(ctx, R);
   if (!tg) return null;
-  if (tg.v.n <= 0n) return null;
-  if (tg.v.n + tg.v.d > 1200000n) return null;
   var kept = prune(ctx, tg);
   if (kept < 4) return null;
   if (verifyCtx(ctx)) return null;

@@ -203,6 +203,8 @@ var MOVES = [
   { id: 'radmeet', w: 7, go: function (ctx, R) {
       if (ctx.circs.length < 2) return null;
       var s = some(R, ctx.circs, 2); if (!s) return null;
+      var shared = s[0].on.filter(function (n) { return s[1].on.indexOf(n) >= 0; });
+      if (shared.length >= 2) return null;      /* then it is just the common chord */
       var ax = radAxis(s[0].c, s[1].c); if (!ax) return null;
       var pp = some(R, ctx.pts, 2); if (!pp) return null;
       var l = linePP(pp[0].p, pp[1].p); if (!l) return null;

@@ -233,9 +233,10 @@ function setLabel() {
     nm = bits.join(' · ') + ' (' + n + ')';
   }
   $('setName').textContent = nm;
-  $('setMeta').textContent = DB.opts.adaptive ? '· adaptive' : '';
-  $('setMeta').style.color = 'var(--muted)';
-  $('setMeta').style.fontSize = '12px';
+  var bits = [];
+  if (DB.opts.adaptive) bits.push('adaptive');
+  if ((DB.opts.ui || 1) !== 1) bits.push(Math.round((DB.opts.ui || 1) * 100) + '%');
+  $('setMeta').textContent = bits.length ? '· ' + bits.join(' · ') : '';
 }
 
 /* ============ progress view ============ */
@@ -322,6 +323,21 @@ $('hintBtn').onclick = showHint;
 $('solBtn').onclick = showSolution;
 $('newBtn').onclick = function () { newProblem(); $('ans').focus(); };
 $('figBtn').onclick = function () { DB.opts.fig = !DB.opts.fig; save(); $('plate').hidden = !DB.opts.fig; $('figBtn').textContent = DB.opts.fig ? 'hide' : 'show'; };
+function applyZoom() {
+  var z = DB.opts.ui || 1;
+  document.documentElement.style.setProperty('--ui', z);
+  $('zVal').textContent = Math.round(z * 100) + '%';
+  setLabel();
+}
+function bumpZoom(d) {
+  var z = Math.round(((DB.opts.ui || 1) + d) * 100) / 100;
+  DB.opts.ui = Math.min(1.8, Math.max(0.8, z));
+  save(); applyZoom();
+}
+$('zIn').onclick = function () { bumpZoom(0.1); };
+$('zOut').onclick = function () { bumpZoom(-0.1); };
+$('zReset').onclick = function () { DB.opts.ui = 1; save(); applyZoom(); };
+
 $('optAdaptive').onchange = function () { DB.opts.adaptive = this.checked; save(); setLabel(); };
 $('optName').onchange = function () { DB.opts.name = this.checked; save(); if (!done) { $('pNamed').hidden = !this.checked; } };
 $('tab-drill').onclick = function () { show('drill'); };
@@ -348,5 +364,5 @@ if (DB.opts.adaptive === undefined) DB.opts.adaptive = true;
 if (DB.opts.fig === undefined) DB.opts.fig = true;
 $('optAdaptive').checked = !!DB.opts.adaptive;
 $('optName').checked = !!DB.opts.name;
-buildChips(); setLabel(); renderLemmas(); renderProgress(); newProblem();
+buildChips(); applyZoom(); setLabel(); renderLemmas(); renderProgress(); newProblem();
 })();

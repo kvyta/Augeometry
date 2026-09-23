@@ -80,6 +80,17 @@ npm i playwright && node tools/fn.js && node tools/fn2.js
 
 ## Notes
 
+- **Answer cleanliness is selected for, not just capped.** A lemma can land on `13/4`
+  or on `826281/23104` depending only on which side lengths came up, and the second is
+  a bash rather than a geometry problem. Curated configurations sample up to 300
+  instances and keep one of the cleanest; wild mode enumerates *every* question its
+  construction can ask (all squared distances, all area ratios, circle radii, ratios of
+  squares), scores each by denominator size and construction depth, and asks the
+  cleanest one — under per-kind budgets, since a squared length naturally carries a
+  squarer denominator than an area ratio. Median `m+n` is ~170 for curated and ~290 for
+  wild, against ~38,000 before this selection existed.
+- Display size is adjustable in Options (80%–180%), and long exact fractions wrap
+  rather than forcing the page wider than a phone screen.
 - Curated problems come with a full synthetic solution. Wild problems come with a
   verified *coordinate* solution and the detected coincidences — nobody derived them,
   so claiming a synthetic proof would be dishonest.
