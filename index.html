@@ -1,0 +1,2632 @@
+<title>Synthetic Geometry Drill</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root{
+  --paper:#EDF0F1; --surface:#FAFBFB; --surface2:#E4E9EA;
+  --ink:#152227; --muted:#5E7178; --rule:#C7D2D6; --rule-soft:#DBE2E4;
+  --accent:#17506E; --accent-ink:#FFFFFF; --accent-wash:#E1EAEF;
+  --hi:#B05C25; --ok:#2E6F4E; --ok-wash:#E1EDE6; --bad:#9E3B33; --bad-wash:#F2E4E2;
+  --fig-ink:#233238; --fig-aux:#8397A0;
+  --sans:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+  --serif:"Spectral",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r:3px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0E1619; --surface:#151F24; --surface2:#1C282E;
+  --ink:#DFE8EB; --muted:#8CA2AA; --rule:#2A383E; --rule-soft:#212D33;
+  --accent:#74B4D6; --accent-ink:#08161C; --accent-wash:#16303E;
+  --hi:#DE9256; --ok:#63B588; --ok-wash:#14291F; --bad:#D9776D; --bad-wash:#2C1917;
+  --fig-ink:#C9D7DC; --fig-aux:#6C838D;
+}}
+:root[data-theme="dark"]{
+  --paper:#0E1619; --surface:#151F24; --surface2:#1C282E;
+  --ink:#DFE8EB; --muted:#8CA2AA; --rule:#2A383E; --rule-soft:#212D33;
+  --accent:#74B4D6; --accent-ink:#08161C; --accent-wash:#16303E;
+  --hi:#DE9256; --ok:#63B588; --ok-wash:#14291F; --bad:#D9776D; --bad-wash:#2C1917;
+  --fig-ink:#C9D7DC; --fig-aux:#6C838D;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;
+  -webkit-text-size-adjust:100%;}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+
+/* ---------- header ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);
+  border-bottom:1px solid var(--rule);}
+.top .inner{max-width:680px;margin:0 auto;padding-block:9px;padding-left:16px;padding-right:16px;
+  display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:8px;min-width:0}
+.brand svg{flex:none;display:block}
+.brand b{font-family:var(--serif);font-weight:600;font-size:16px;letter-spacing:.005em;white-space:nowrap}
+.brand span{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  border-left:1px solid var(--rule);padding-left:8px;white-space:nowrap}
+.tabs{display:flex;gap:0;border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+.tabs button{background:none;border:0;padding:6px 11px;font-size:12.5px;color:var(--muted);cursor:pointer;
+  border-right:1px solid var(--rule)}
+.tabs button:last-child{border-right:0}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);font-weight:500}
+
+main{max-width:680px;margin:0 auto;padding-left:16px;padding-right:16px;padding-block:16px 56px}
+
+/* ---------- filter bar ---------- */
+.setbar{border:1px solid var(--rule);border-radius:var(--r);background:var(--surface);margin-bottom:16px}
+.setbar>summary{list-style:none;cursor:pointer;padding:10px 13px;display:flex;align-items:center;gap:8px;
+  font-size:12.5px;color:var(--muted)}
+.setbar>summary::-webkit-details-marker{display:none}
+.setbar>summary b{color:var(--ink);font-weight:500}
+.setbar>summary .caret{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.setbar[open]>summary{border-bottom:1px solid var(--rule-soft)}
+.setbody{padding:12px 13px 14px;display:flex;flex-direction:column;gap:11px}
+.frow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.flabel{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  width:100%;}
+.chip{border:1px solid var(--rule);background:var(--surface);border-radius:var(--r);padding:4px 9px;
+  font-size:12.5px;color:var(--muted);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent-wash);border-color:var(--accent);color:var(--ink);font-weight:500}
+.tog{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink);cursor:pointer}
+.tog input{accent-color:var(--accent);width:15px;height:15px;margin:0}
+
+/* ---------- problem item ---------- */
+.item{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+.eyebrow{display:flex;align-items:center;gap:9px;padding:9px 15px;border-bottom:1px solid var(--rule-soft);
+  background:var(--surface2);flex-wrap:wrap}
+.tier{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  padding:2.5px 7px;border-radius:2px;border:1px solid currentColor;font-weight:500}
+.tier.t1{color:var(--muted)} .tier.t2{color:var(--accent)} .tier.t3{color:var(--hi)}
+.tier.t4{color:var(--ok)}
+.eyebrow .topic{font-size:12px;color:var(--muted)}
+.eyebrow .clock{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--muted);
+  font-variant-numeric:tabular-nums}
+.body{padding:16px 15px}
+.stmt{font-family:var(--serif);font-size:17.5px;line-height:1.62;margin:0}
+.stmt em{color:var(--hi);font-style:italic}
+.ask{font-family:var(--serif);font-size:16.5px;line-height:1.55;margin:14px 0 0;padding-top:13px;
+  border-top:1px solid var(--rule-soft);font-weight:500}
+.ask b{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--hi)}
+
+/* ---------- figure plate ---------- */
+.plate{margin:15px 0 0;border:1px solid var(--rule-soft);border-radius:2px;background:var(--paper);overflow:hidden}
+.plate .fig{width:100%;aspect-ratio:10/7;display:block}
+.plate svg{width:100%;height:100%;display:block}
+.plate figcaption{border-top:1px solid var(--rule-soft);padding:6px 10px;display:flex;gap:10px;align-items:center;
+  font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.plate figcaption button{margin-left:auto;background:none;border:0;padding:0;color:var(--accent);cursor:pointer;
+  font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;text-decoration:underline}
+.fig-main{fill:none;stroke:var(--fig-ink);stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+.fig-aux{fill:none;stroke:var(--fig-aux);stroke-width:1.5;stroke-linecap:round}
+.fig-dash{fill:none;stroke:var(--fig-aux);stroke-width:1.3;stroke-dasharray:7 6;stroke-linecap:round}
+.fig-hi{fill:none;stroke:var(--hi);stroke-width:3.1;stroke-linecap:round}
+.fig-circ{fill:none;stroke:var(--accent);stroke-width:1.7;opacity:.85}
+.fig-circ-dash{fill:none;stroke:var(--fig-aux);stroke-width:1.2;stroke-dasharray:6 7}
+.fig-circ-hi{fill:none;stroke:var(--hi);stroke-width:2.3}
+.fig-dot{fill:var(--fig-ink);stroke:var(--paper);stroke-width:1.5}
+.fig-lab{font-family:var(--mono);font-size:21px;font-weight:500;fill:var(--fig-ink);
+  paint-order:stroke;stroke:var(--paper);stroke-width:5;stroke-linejoin:round}
+
+/* ---------- answer ---------- */
+.answer{display:flex;gap:8px;margin-top:14px}
+.answer input{flex:1;min-width:0;font-family:var(--mono);font-size:19px;font-weight:500;padding:11px 13px;
+  background:var(--paper);color:var(--ink);border:1px solid var(--rule);border-radius:var(--r);
+  font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.answer input::placeholder{color:var(--muted);font-weight:400;letter-spacing:0;font-size:15px}
+.btn{border:1px solid var(--rule);background:var(--surface2);border-radius:var(--r);padding:10px 15px;
+  cursor:pointer;font-size:14px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:500}
+.btn:disabled{opacity:.45;cursor:default}
+.verdict{margin-top:12px;padding:11px 13px;border-radius:var(--r);border:1px solid;font-size:14px;line-height:1.5}
+.verdict.good{background:var(--ok-wash);border-color:var(--ok);color:var(--ok)}
+.verdict.bad{background:var(--bad-wash);border-color:var(--bad);color:var(--bad)}
+.verdict .val{font-family:var(--mono);font-weight:600;color:var(--ink)}
+.verdict .named{display:block;margin-top:5px;color:var(--ink);font-size:13px}
+.verdict .named b{font-weight:600}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}
+.actions .btn{flex:1 1 auto;min-width:112px;text-align:center}
+
+/* ---------- hints & solution ---------- */
+.hints{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:9px;counter-reset:h}
+.hints li{counter-increment:h;position:relative;padding-left:34px;font-size:14.5px;line-height:1.58;color:var(--ink)}
+.hints li::before{content:counter(h);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;
+  border:1px solid var(--rule);display:grid;place-items:center;font-family:var(--mono);font-size:11px;
+  color:var(--muted);background:var(--surface2)}
+.sol{margin-top:15px;padding-top:14px;border-top:2px solid var(--rule)}
+.sol h4{margin:0 0 9px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);font-weight:500}
+.sol p{margin:0 0 10px;font-size:14.5px;line-height:1.62}
+.sol p.k{font-family:var(--mono);font-size:13.5px;line-height:1.55;background:var(--surface2);
+  border-left:2px solid var(--hi);padding:9px 11px;border-radius:0 2px 2px 0;overflow-x:auto}
+.sol b{font-weight:600}
+.sol em{color:var(--muted);font-size:13.5px}
+.lemcard{margin-top:14px;padding:11px 13px;background:var(--accent-wash);border-radius:var(--r);font-size:13.5px;
+  line-height:1.55}
+.lemcard strong{display:block;font-family:var(--serif);font-size:15px;margin-bottom:3px}
+
+/* ---------- progress ---------- */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);
+  border-radius:var(--r);overflow:hidden;margin-bottom:18px}
+.tile{background:var(--surface);padding:12px 8px;text-align:center}
+.tile .n{font-family:var(--mono);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;display:block}
+.tile .l{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+h2.sec{font-family:var(--serif);font-size:19px;margin:0 0 4px;font-weight:600}
+p.sub{margin:0 0 14px;font-size:13.5px;color:var(--muted)}
+.rows{display:flex;flex-direction:column;border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+.row{background:var(--surface);padding:11px 13px;border-bottom:1px solid var(--rule-soft);display:grid;
+  grid-template-columns:1fr auto;gap:4px 12px;align-items:baseline;cursor:pointer;text-align:left;border-left:0;
+  border-right:0;border-top:0;width:100%;font:inherit;color:inherit}
+.row:last-child{border-bottom:0}
+.row:hover{background:var(--surface2)}
+.row .nm{font-size:14px;line-height:1.35}
+.row .sc{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;color:var(--muted)}
+.row .bar{grid-column:1/-1;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;margin-top:3px}
+.row .bar i{display:block;height:100%;background:var(--accent)}
+.row.weak .bar i{background:var(--bad)} .row.strong .bar i{background:var(--ok)}
+.row .meta{grid-column:1/-1;font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.04em}
+.row.untried .nm{color:var(--muted)}
+
+/* ---------- lemma index ---------- */
+.group{margin-bottom:22px}
+.group h3{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  margin:0 0 8px;font-weight:500;padding-bottom:6px;border-bottom:1px solid var(--rule)}
+.lem{padding:12px 0;border-bottom:1px solid var(--rule-soft);display:flex;flex-direction:column;gap:5px}
+.lem:last-child{border-bottom:0}
+.lem .hd{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.lem .nm{font-family:var(--serif);font-size:16px;font-weight:600;line-height:1.3}
+.lem p{margin:0;font-size:13.5px;line-height:1.58;color:var(--muted)}
+.lem .go{align-self:flex-start;background:none;border:1px solid var(--rule);border-radius:var(--r);
+  padding:4px 10px;font-size:12px;color:var(--accent);cursor:pointer;margin-top:2px}
+.lem .go:hover{border-color:var(--accent);background:var(--accent-wash)}
+.foot{margin-top:26px;padding-top:14px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--muted);
+  line-height:1.6}
+.foot button{background:none;border:0;padding:0;color:var(--bad);cursor:pointer;text-decoration:underline;font-size:12.5px}
+@media (max-width:420px){
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .stmt{font-size:16.5px}
+  .brand span{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="top">
+  <div class="inner">
+    <div class="brand">
+      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".55"/>
+        <path d="M4.6 15.2 L19.4 15.2 L12 3.9 Z" fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linejoin="round"/>
+        <circle cx="12" cy="15.2" r="1.6" fill="currentColor"/>
+      </svg>
+      <b>Synthetic Geometry</b><span>Drill</span>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button id="tab-drill" role="tab" aria-selected="true">Drill</button>
+      <button id="tab-progress" role="tab" aria-selected="false">Progress</button>
+      <button id="tab-lemmas" role="tab" aria-selected="false">Lemmas</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section id="view-drill">
+    <details class="setbar" id="setbar">
+      <summary><b id="setName">All 18 lemmas</b><span id="setMeta"></span><span class="caret">options</span></summary>
+      <div class="setbody">
+        <div class="frow"><span class="flabel">Topic</span><span id="topicChips"></span></div>
+        <div class="frow"><span class="flabel">Level</span><span id="tierChips"></span></div>
+        <div class="frow" style="gap:16px;padding-top:2px">
+          <label class="tog"><input type="checkbox" id="optAdaptive" checked>Favor my weak spots</label>
+          <label class="tog"><input type="checkbox" id="optName">Name the lemma up front</label>
+        </div>
+      </div>
+    </details>
+
+    <article class="item">
+      <div class="eyebrow">
+        <span class="tier t2" id="pTier">AIME</span>
+        <span class="topic" id="pTopic"></span>
+        <span class="clock" id="pClock">0:00</span>
+      </div>
+      <div class="body">
+        <div id="pNamed" hidden class="lemcard" style="margin:0 0 14px"><strong id="pNamedT"></strong><span id="pNamedL"></span></div>
+        <p class="stmt" id="pStmt"></p>
+        <figure class="plate" id="plate">
+          <div class="fig" id="pFig"></div>
+          <figcaption><span id="figCap">Figure — drawn to scale</span><button id="figBtn">hide</button></figcaption>
+        </figure>
+        <p class="ask" id="pAsk"></p>
+        <form class="answer" id="ansForm">
+          <input id="ans" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off"
+                 spellcheck="false" placeholder="your integer answer" aria-label="Answer">
+          <button class="btn primary" type="submit" id="checkBtn">Check</button>
+        </form>
+        <div class="verdict" id="verdict" hidden></div>
+        <div class="actions">
+          <button class="btn" id="hintBtn">Hint 1 of 3</button>
+          <button class="btn" id="solBtn">Solution</button>
+          <button class="btn" id="newBtn">New problem</button>
+        </div>
+        <ol class="hints" id="hints"></ol>
+        <div class="sol" id="sol" hidden><h4>Solution</h4><div id="solBody"></div></div>
+      </div>
+    </article>
+  </section>
+
+  <section id="view-progress" hidden>
+    <h2 class="sec">Where you stand</h2>
+    <p class="sub" id="progSub">Accuracy by configuration, weakest first.</p>
+    <div class="tiles">
+      <div class="tile"><span class="n" id="sAtt">0</span><span class="l">Attempted</span></div>
+      <div class="tile"><span class="n" id="sAcc">—</span><span class="l">Accuracy</span></div>
+      <div class="tile"><span class="n" id="sStreak">0</span><span class="l">Streak</span></div>
+      <div class="tile"><span class="n" id="sBest">0</span><span class="l">Best run</span></div>
+    </div>
+    <div class="frow" style="margin-bottom:12px"><button class="btn" id="weakBtn">Drill my 5 weakest</button></div>
+    <div class="rows" id="progRows"></div>
+    <div class="foot">Tap any configuration to drill it on its own.
+      <button id="resetBtn">Reset all progress</button></div>
+  </section>
+
+  <section id="view-lemmas" hidden>
+    <h2 class="sec">The configurations</h2>
+    <p class="sub">Every problem in the drill comes from one of these. Worth knowing cold.</p>
+    <div id="lemBody"></div>
+  </section>
+</main>
+
+<script>
+/* ===================================================================
+   Olympiad Geometry Drill - generator core
+   Exact rational arithmetic (BigInt) so every answer is a clean m/n.
+   =================================================================== */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.GEO = factory();
+}(typeof self !== 'undefined' ? self : this, function () {
+'use strict';
+
+/* ---------- exact rationals ---------- */
+function bgcd(a, b) { if (a < 0n) a = -a; if (b < 0n) b = -b; while (b) { var t = a % b; a = b; b = t; } return a; }
+function fr(n, d) {
+  n = BigInt(n); d = (d === undefined ? 1n : BigInt(d));
+  if (d === 0n) throw new Error('division by zero');
+  if (d < 0n) { n = -n; d = -d; }
+  var g = bgcd(n, d); if (g === 0n) g = 1n;
+  return { n: n / g, d: d / g };
+}
+var fadd = function (x, y) { return fr(x.n * y.d + y.n * x.d, x.d * y.d); };
+var fsub = function (x, y) { return fr(x.n * y.d - y.n * x.d, x.d * y.d); };
+var fmul = function (x, y) { return fr(x.n * y.n, x.d * y.d); };
+var fdiv = function (x, y) { return fr(x.n * y.d, x.d * y.n); };
+var fnum = function (x) { return Number(x.n) / Number(x.d); };
+var fint = function (x) { return x.d === 1n; };
+function fstr(x) { return x.d === 1n ? String(x.n) : (String(x.n) + '/' + String(x.d)); }
+
+/* ---------- seeded RNG (mulberry32) ---------- */
+function rng(seed) {
+  var a = seed >>> 0;
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    var t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function ri(R, lo, hi) { return lo + Math.floor(R() * (hi - lo + 1)); }
+function pick(R, arr) { return arr[Math.floor(R() * arr.length)]; }
+
+/* ---------- triangle shape helpers (floating point, for validity + figures) ---------- */
+function angles(a, b, c) {
+  return [
+    Math.acos((b * b + c * c - a * a) / (2 * b * c)),
+    Math.acos((c * c + a * a - b * b) / (2 * c * a)),
+    Math.acos((a * a + b * b - c * c) / (2 * a * b))
+  ];
+}
+function shapely(a, b, c, minDeg, maxDeg) {
+  if (a + b <= c || b + c <= a || c + a <= b) return false;
+  var A = angles(a, b, c), lo = minDeg * Math.PI / 180, hi = maxDeg * Math.PI / 180;
+  for (var i = 0; i < 3; i++) if (A[i] < lo || A[i] > hi) return false;
+  return true;
+}
+/* random integer triangle, sides in [lo,hi], angles in [22,140] degrees */
+function randTri(R, lo, hi) {
+  lo = lo || 7; hi = hi || 21;
+  for (var k = 0; k < 4000; k++) {
+    var a = ri(R, lo, hi), b = ri(R, lo, hi), c = ri(R, lo, hi);
+    if (a === b && b === c) continue;
+    if (!shapely(a, b, c, 28, 124)) continue;
+    return { a: a, b: b, c: c };
+  }
+  return { a: 14, b: 13, c: 15 };
+}
+
+/* full coordinate model of triangle ABC: BC = a, CA = b, AB = c */
+function model(a, b, c) {
+  var B = [0, 0], C = [a, 0];
+  var x = (a * a + c * c - b * b) / (2 * a);
+  var y = Math.sqrt(Math.max(c * c - x * x, 1e-12));
+  var A = [x, y];
+  var s = (a + b + c) / 2;
+  var K = Math.sqrt(s * (s - a) * (s - b) * (s - c));
+  var Rc = a * b * c / (4 * K);
+  var oy = Math.sqrt(Math.max(Rc * Rc - a * a / 4, 1e-12)) * (y > 0 ? 1 : -1);
+  /* circumcentre is on x = a/2; pick the sign consistently by solving directly */
+  var k = (x * x + y * y - a * x) / (2 * y);   /* from |O-B| = |O-A| with O=(a/2,k) */
+  var O = [a / 2, k];
+  var r = K / s;
+  var I = [(a * A[0] + b * B[0] + c * C[0]) / (a + b + c), (a * A[1] + b * B[1] + c * C[1]) / (a + b + c)];
+  var H = [A[0] + B[0] + C[0] - 2 * O[0], A[1] + B[1] + C[1] - 2 * O[1]];
+  var N = [(O[0] + H[0]) / 2, (O[1] + H[1]) / 2];
+  var IA = [(-a * A[0] + b * B[0] + c * C[0]) / (-a + b + c), (-a * A[1] + b * B[1] + c * C[1]) / (-a + b + c)];
+  var M = [a / 2, k - Rc];              /* arc midpoint of BC not containing A (A is above BC) */
+  return { a: a, b: b, c: c, A: A, B: B, C: C, O: O, I: I, H: H, N: N, IA: IA, M: M, R: Rc, r: r, s: s, K: K, oy: oy };
+}
+var d2 = function (P, Q) { var dx = P[0] - Q[0], dy = P[1] - Q[1]; return dx * dx + dy * dy; };
+var dist = function (P, Q) { return Math.sqrt(d2(P, Q)); };
+var mid = function (P, Q) { return [(P[0] + Q[0]) / 2, (P[1] + Q[1]) / 2]; };
+var lerp = function (P, Q, t) { return [P[0] + (Q[0] - P[0]) * t, P[1] + (Q[1] - P[1]) * t]; };
+function meet(P1, P2, P3, P4) {           /* intersection of lines P1P2 and P3P4 */
+  var x1 = P1[0], y1 = P1[1], x2 = P2[0], y2 = P2[1], x3 = P3[0], y3 = P3[1], x4 = P4[0], y4 = P4[1];
+  var den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+  var A1 = x1 * y2 - y1 * x2, A2 = x3 * y4 - y3 * x4;
+  return [(A1 * (x3 - x4) - (x1 - x2) * A2) / den, (A1 * (y3 - y4) - (y1 - y2) * A2) / den];
+}
+/* foot of perpendicular from P to line QR */
+function foot(P, Q, R2) {
+  var dx = R2[0] - Q[0], dy = R2[1] - Q[1];
+  var t = ((P[0] - Q[0]) * dx + (P[1] - Q[1]) * dy) / (dx * dx + dy * dy);
+  return [Q[0] + t * dx, Q[1] + t * dy];
+}
+/* ---------- shared statement helpers ---------- */
+function sides(p) { return 'BC = ' + p.a + ', CA = ' + p.b + ', AB = ' + p.c; }
+function Tval(a, b, c) { return (a + b + c) * (b + c - a) * (c + a - b) * (a + b - c); } /* = 16K^2 */
+function bigT(a, b, c) { a = BigInt(a); b = BigInt(b); c = BigInt(c); return (a + b + c) * (b + c - a) * (c + a - b) * (a + b - c); }
+function sq(x) { return x * x; }
+function num(v) { return String(v); }
+
+/* label a point object for figures */
+function P(pt, l, dir) { return { t: 'pt', p: pt, l: l, dir: dir }; }
+function S(p1, p2, o) { o = o || {}; return { t: 'seg', p: p1, q: p2, dash: o.dash ? 1 : 0, k: o.k || 'aux' }; }
+function CIR(c, r, o) { o = o || {}; return { t: 'circ', c: c, r: r, dash: o.dash ? 1 : 0, k: o.k || 'aux' }; }
+function TRI(m) { return [S(m.A, m.B, { k: 'main' }), S(m.B, m.C, { k: 'main' }), S(m.C, m.A, { k: 'main' })]; }
+function ABC(m) { return [P(m.A, 'A'), P(m.B, 'B'), P(m.C, 'C')]; }
+
+var CONFIGS = [];
+
+/* ============ 1. Incenter-Excenter Lemma (Fact 5) ============ */
+CONFIGS.push({
+  id: 'fact5', tier: 2, topic: 'incenter',
+  name: 'Incenter–Excenter Lemma ("Fact 5")',
+  lemma: 'If M is the midpoint of arc BC not containing A, then MB = MC = MI = MI<sub>A</sub>. Equivalently, M is the circumcenter of BICI<sub>A</sub>.',
+  gen: function (R) { var t = randTri(R, 8, 21); return { a: t.a, b: t.b, c: t.c }; },
+  value: function (p) {
+    var a = BigInt(p.a), b = BigInt(p.b), c = BigInt(p.c);
+    return fr(a * a * b * c, (a + b + c) * (b + c - a));
+  },
+  quantity: 'MI²',
+  statement: function (p) {
+    return 'Triangle ABC has ' + sides(p) + '. Let I be the incenter of ABC, and let M be the midpoint of arc BC of the circumcircle not containing A.';
+  },
+  hints: [
+    'Chase angles in triangle MBI: show ∠MBI = ∠MIB = (A + B)/2. What does that make triangle MBI?',
+    'That is the Incenter–Excenter Lemma: MI = MB = MC. So the whole problem reduces to finding the chord MB.',
+    'MB is the chord subtending inscribed angle ∠BAM = A/2, so MB = 2R·sin(A/2). Now use sin²(A/2) = (s−b)(s−c)/bc and R = abc/4K.'
+  ],
+  solution: function (p) {
+    return '<p><b>Fact 5.</b> ∠MBC = ∠MAC = A/2 (same arc MC), so ∠MBI = ∠MBC + ∠CBI = A/2 + B/2. Also ∠MIB is exterior to triangle ABI, so ∠MIB = ∠IAB + ∠IBA = A/2 + B/2. Hence triangle MBI is isosceles and <b>MI = MB</b>.</p>' +
+      '<p>MB subtends inscribed angle ∠BAM = A/2, so MB = 2R·sin(A/2). Squaring and using sin²(A/2) = (s−b)(s−c)/(bc), R = abc/(4K), K² = s(s−a)(s−b)(s−c):</p>' +
+      '<p class="k">MI² = 4R²·(s−b)(s−c)/(bc) = a²bc / (4s(s−a)) = a²bc / ((a+b+c)(b+c−a))</p>' +
+      '<p>With a = ' + p.a + ', b = ' + p.b + ', c = ' + p.c + ': MI² = ' + p.a + '²·' + p.b + '·' + p.c + ' / (' + (p.a + p.b + p.c) + '·' + (p.b + p.c - p.a) + ').</p>';
+  },
+  figure: function (p) {
+    var m = model(p.a, p.b, p.c), g = [];
+    g.push(CIR(m.O, m.R, { k: 'main' }));
+    g.push(CIR(m.M, dist(m.M, m.B), { dash: 1 }));
+    g = g.concat(TRI(m));
+    g.push(S(m.A, m.M, { dash: 1 }), S(m.M, m.B), S(m.M, m.C), S(m.M, m.I, { k: 'hi' }));
+    g = g.concat(ABC(m));
+    g.push(P(m.I, 'I'), P(m.M, 'M'));
+    return g;
+  },
+  verify: function (p) { var m = model(p.a, p.b, p.c); return d2(m.M, m.I); }
+});
+
+/* ============ 2. Distance from vertex to incenter ============ */
+CONFIGS.push({
+  id: 'ai_len', tier: 1, topic: 'incenter',
+  name: 'Incircle touch lengths (AI = r / sin(A/2))',
+  lemma: 'The incircle touches AB and AC at distance s−a from A; hence AI² = (s−a)² + r² = bc(s−a)/s.',
+  gen: function (R) { var t = randTri(R, 7, 20); return { a: t.a, b: t.b, c: t.c }; },
+  value: function (p) {
+    var a = BigInt(p.a), b = BigInt(p.b), c = BigInt(p.c);
+    return fr(b * c * (b + c - a), (a + b + c));
+  },
+  quantity: 'AI²',
+  statement: function (p) {
+    return 'Triangle ABC has ' + sides(p) + ', and I is its incenter.';
+  },
+  hints: [
+    'Let the incircle touch AB at F. The two tangent lengths from each vertex are equal — what is AF in terms of s?',
+    'AF = s − a, and IF = r with ∠AFI = 90°.',
+    'So AI² = (s−a)² + r², and r² = (s−a)(s−b)(s−c)/s. Simplify: s(s−a) + (s−b)(s−c) = bc.'
+  ],
+  solution: function (p) {
+    var s2 = p.a + p.b + p.c;
+    return '<p>Equal tangents give AF = s − a, where the incircle touches AB at F. Since IF ⟂ AB and IF = r,</p>' +
+      '<p class="k">AI² = (s−a)² + r² = (s−a)² + (s−a)(s−b)(s−c)/s = (s−a)·[s(s−a) + (s−b)(s−c)]/s.</p>' +
+      '<p>Expanding, s(s−a) + (s−b)(s−c) = bc, so</p>' +
+      '<p class="k">AI² = bc(s−a)/s = bc(b+c−a)/(a+b+c)</p>' +
+      '<p>Here that is ' + p.b + '·' + p.c + '·' + (p.b + p.c - p.a) + ' / ' + s2 + '.</p>';
+  },
+  figure: function (p) {
+    var m = model(p.a, p.b, p.c), F = foot(m.I, m.A, m.B), g = [];
+    g.push(CIR(m.I, m.r, { k: 'main' }));
+    g = g.concat(TRI(m));
+    g.push(S(m.A, m.I, { k: 'hi' }), S(m.I, F, { dash: 1 }));
+    g = g.concat(ABC(m));
+    g.push(P(m.I, 'I'), P(F, 'F'));
+    return g;
+  },
+  verify: function (p) { var m = model(p.a, p.b, p.c); return d2(m.A, m.I); }
+});
+
+/* ============ 3. Euler's formula OI² = R² − 2Rr ============ */
+CONFIGS.push({
+  id: 'euler_oi', tier: 2, topic: 'incenter',
+  name: "Euler's formula OI² = R² − 2Rr",
+  lemma: 'For any triangle, OI² = R(R − 2r). (Proof: the power of I in the circumcircle is −AI·IM = −2Rr by Fact 5.)',
+  gen: function (R) { var t = randTri(R, 8, 20); return { a: t.a, b: t.b, c: t.c }; },
+  value: function (p) {
+    var a = BigInt(p.a), b = BigInt(p.b), c = BigInt(p.c), T = bigT(p.a, p.b, p.c);
+    return fsub(fr(a * a * b * b * c * c, T), fr(a * b * c, a + b + c));
+  },
+  quantity: 'OI²',
+  statement: function (p) {
+    return 'Triangle ABC has ' + sides(p) + '. Let O be its circumcenter and I its incenter.';
+  },
+  hints: [
+    'Compute the power of the point I with respect to the circumcircle in two ways.',
+    'Power of I = OI² − R², and it also equals −AI·IM where AI extended meets the circle again at the arc midpoint M.',
+    'By Fact 5, IM = MB = 2R sin(A/2), and AI = r/sin(A/2), so AI·IM = 2Rr. Hence OI² = R² − 2Rr, with R = abc/4K and r = K/s.'
+  ],
+  solution: function (p) {
+    return '<p>Let line AI meet the circumcircle again at M. The power of I is OI² − R² = −AI·IM.</p>' +
+      '<p>Now AI = r/sin(A/2), and by Fact 5 IM = MB = 2R·sin(A/2). Multiplying, AI·IM = 2Rr, which gives <b>Euler\'s formula</b>:</p>' +
+      '<p class="k">OI² = R² − 2Rr</p>' +
+      '<p>With R = abc/(4K) and r = K/s we get Rr = abc/(4s), so</p>' +
+      '<p class="k">OI² = a²b²c²/(16K²) − abc/(2s) = a²b²c²/T − abc/(a+b+c),&nbsp; T = (a+b+c)(b+c−a)(c+a−b)(a+b−c)</p>' +
+      '<p>Here T = ' + Tval(p.a, p.b, p.c) + '.</p>';
+  },
+  figure: function (p) {
+    var m = model(p.a, p.b, p.c), g = [];
+    g.push(CIR(m.O, m.R, { k: 'main' }), CIR(m.I, m.r, { k: 'main' }));
+    g = g.concat(TRI(m));
+    g.push(S(m.O, m.I, { k: 'hi' }), S(m.A, m.M, { dash: 1 }));
+    g = g.concat(ABC(m));
+    g.push(P(m.O, 'O'), P(m.I, 'I'), P(m.M, 'M'));
+    return g;
+  },
+  verify: function (p) { var m = model(p.a, p.b, p.c); return d2(m.O, m.I); }
+});
+
+/* ============ 4. OH² = 9R² − (a²+b²+c²) ============ */
+CONFIGS.push({
+  id: 'euler_oh', tier: 3, topic: 'orthocenter',
+  name: 'Euler line: OH² = 9R² − (a²+b²+c²)',
+  lemma: 'With O as origin, H = A + B + C. Hence OH² = 9R² − (a²+b²+c²), and O, G, H are collinear with OG : GH = 1 : 2.',
+  gen: function (R) { var t = randTri(R, 8, 20); return { a: t.a, b: t.b, c: t.c }; },
+  value: function (p) {
+    var a = BigInt(p.a), b = BigInt(p.b), c = BigInt(p.c), T = bigT(p.a, p.b, p.c);
+    return fsub(fr(9n * a * a * b * b * c * c, T), fr(a * a + b * b + c * c, 1n));
+  },
+  quantity: 'OH²',
+  statement: function (p) {
+    return 'Triangle ABC has ' + sides(p) + '. Let O be the circumcenter and H the orthocenter.';
+  },
+  hints: [
+    'Put the circumcenter at the origin and write everything as vectors.',
+    'Show that the point with position vector A + B + C is the orthocenter (check that (A+B+C) − A is perpendicular to B − C).',
+    'Then OH² = |A+B+C|² = 3R² + 2(A·B + B·C + C·A), and 2A·B = 2R² − c² since |A−B|² = c².'
+  ],
+  solution: function (p) {
+    return '<p>Place O at the origin, so |A| = |B| = |C| = R. Let X = A + B + C. Then X − A = B + C, and (B + C)·(B − C) = |B|² − |C|² = 0, so AX ⟂ BC. By symmetry X is the <b>orthocenter</b> H.</p>' +
+      '<p>Therefore OH² = |A+B+C|² = 3R² + 2(A·B + B·C + C·A). From |A − B|² = c² we get 2A·B = 2R² − c², so</p>' +
+      '<p class="k">OH² = 3R² + (2R² − c²) + (2R² − a²) + (2R² − b²) = 9R² − (a² + b² + c²)</p>' +
+      '<p>With R² = a²b²c²/T, T = (a+b+c)(b+c−a)(c+a−b)(a+b−c) = ' + Tval(p.a, p.b, p.c) + ', and a²+b²+c² = ' + (p.a * p.a + p.b * p.b + p.c * p.c) + '.</p>';
+  },
+  figure: function (p) {
+    var m = model(p.a, p.b, p.c), G = [(m.A[0] + m.B[0] + m.C[0]) / 3, (m.A[1] + m.B[1] + m.C[1]) / 3], g = [];
+    g.push(CIR(m.O, m.R, { k: 'main' }));
+    g = g.concat(TRI(m));
+    g.push(S(m.O, m.H, { k: 'hi' }));
+    g = g.concat(ABC(m));
+    g.push(P(m.O, 'O'), P(m.H, 'H'), P(G, 'G'));
+    return g;
+  },
+  verify: function (p) { var m = model(p.a, p.b, p.c); return d2(m.O, m.H); }
+});
+
+/* ============ 5. AH = 2R cos A / reflection of H ============ */
+CONFIGS.push({
+  id: 'orth_ah', tier: 2, topic: 'orthocenter',
+  name: 'AH = 2·OM<sub>a</sub> = 2R cos A',
+  lemma: 'The reflection of H over BC lies on the circumcircle, and the reflection over the midpoint of BC is the antipode of A. Consequently AH = 2R·cos A.',
+  gen: function (R) {
+    for (var k = 0; k < 500; k++) {
+      var t = randTri(R, 8, 20);
+      if (Math.abs(t.b * t.b + t.c * t.c - t.a * t.a) >= 12) return { a: t.a, b: t.b, c: t.c };
+    }
+    return { a: 14, b: 13, c: 15 };
+  },
+  value: function (p) {
+    var a = BigInt(p.a), b = BigInt(p.b), c = BigInt(p.c), T = bigT(p.a, p.b, p.c);
+    var e = b * b + c * c - a * a;
+    return fr(a * a * e * e, T);
+  },
+  quantity: 'AH²',
+  statement: function (p) {
+    return 'Triangle ABC has ' + sides(p) + ', and H is its orthocenter.';
+  },
+  hints: [
+    'Let A\' be the antipode of A on the circumcircle. What can you say about BHCA\'?',
+    'BHCA\' is a parallelogram (both pairs of sides are perpendicular to the same lines), so AH = 2·OM where M is the midpoint of BC.',
+    'OM = R cos A, so AH = 2R cos A. Now cos A = (b²+c²−a²)/(2bc) and R = abc/4K.'
+  ],
+  solution: function (p) {
+    return '<p>Let A\' be the antipode of A. Then BH ⟂ AC and A\'C ⟂ AC, so BH ∥ A\'C; likewise CH ∥ A\'B. So <b>BHCA\' is a parallelogram</b> and its diagonals bisect: the midpoint M of BC is the midpoint of HA\'.</p>' +
+      '<p>Then OM is a midline of triangle AHA\', giving AH = 2·OM = 2R·cos A. Squaring with cos A = (b²+c²−a²)/(2bc) and R² = a²b²c²/T:</p>' +
+      '<p class="k">AH² = 4R²cos²A = a²(b²+c²−a²)² / T,&nbsp; T = (a+b+c)(b+c−a)(c+a−b)(a+b−c)</p>' +
+      '<p>Here b²+c²−a² = ' + (p.b * p.b + p.c * p.c - p.a * p.a) + ' and T = ' + Tval(p.a, p.b, p.c) + '.</p>';
+  },
+  figure: function (p) {
+    var m = model(p.a, p.b, p.c), Ma = mid(m.B, m.C);
+    var Ap = [2 * m.O[0] - m.A[0], 2 * m.O[1] - m.A[1]];
+    var Hr = [m.H[0], -m.H[1]];
+    var g = [CIR(m.O, m.R, { k: 'main' })];
+    g = g.concat(TRI(m));
+    g.push(S(m.A, m.H, { k: 'hi' }), S(m.H, Hr, { dash: 1 }), S(m.B, Ap, { dash: 1 }), S(m.C, Ap, { dash: 1 }), S(m.A, Ap, { dash: 1 }));
+    g = g.concat(ABC(m));
+    g.push(P(m.H, 'H'), P(m.O, 'O'), P(Ap, "A'"), P(Hr, 'H*'), P(Ma, 'M'));
+    return g;
+  },
+  verify: function (p) { var m = model(p.a, p.b, p.c); return d2(m.A, m.H); }
+});
+
+/* ============ 6. Symmedian ============ */
+CONFIGS.push({
+  id: 'symmedian', tier: 2, topic: 'ratios',
+  name: 'The symmedian divides BC in ratio c² : b²',
+  lemma: 'The reflection of the median AM over the bisector of ∠A (the A-symmedian) meets BC at D with BD : DC = AB² : AC² = c² : b².',
+  gen: function (R) { var t = randTri(R, 7, 19); if (t.b === t.c) t.b = t.b + 1; return { a: t.a, b: t.b, c: t.c }; },
+  value: function (p) {
+    var a = BigInt(p.a), b = BigInt(p.b), c = BigInt(p.c);
+    var den = b * b + c * c;
+    return fr(b * b * c * c * (2n * b * b + 2n * c * c - a * a), den * den);
+  },
+  quantity: 'AD²',
+  statement: function (p) {
+    return 'In triangle ABC, ' + sides(p) + '. The A-symmedian (the reflection of the median from A over the internal bisector of ∠A) meets BC at D.';
+  },
+  hints: [
+    'If a cevian AD and the median AM are isogonal, compare the ratios in which they cut BC. Use the ratio lemma: BD/DC = (AB/AC)·(sin∠BAD / sin∠DAC).',
+    'Isogonality swaps the two angles, so BD/DC equals (c/b)·(c/b) = c²/b².',
+    'Now BD = ac²/(b²+c²), DC = ab²/(b²+c²), and finish with Stewart\'s theorem: AD² = (b²·BD + c²·DC)/a − BD·DC.'
+  ],
+  solution: function (p) {
+    var b2c2 = p.b * p.b + p.c * p.c;
+    return '<p>By the ratio lemma, BD/DC = (AB/AC)·(sin∠BAD/sin∠DAC). For the median, BM/MC = 1 gives sin∠BAM/sin∠MAC = b/c. The symmedian is isogonal to the median, so its two angles are swapped, giving sin∠BAD/sin∠DAC = c/b and</p>' +
+      '<p class="k">BD : DC = c² : b²</p>' +
+      '<p>So BD = ac²/(b²+c²) and DC = ab²/(b²+c²). Stewart\'s theorem AD² = (b²·BD + c²·DC)/a − BD·DC gives</p>' +
+      '<p class="k">AD² = b²c²(2b² + 2c² − a²) / (b² + c²)²</p>' +
+      '<p>Here b²+c² = ' + b2c2 + ' and 2b²+2c²−a² = ' + (2 * b2c2 - p.a * p.a) + '.</p>';
+  },
+  figure: function (p) {
+    var m = model(p.a, p.b, p.c), Ma = mid(m.B, m.C);
+    var D = lerp(m.B, m.C, (p.c * p.c) / (p.b * p.b + p.c * p.c));
+    var g = TRI(m).slice();
+    g.push(S(m.A, D, { k: 'hi' }), S(m.A, Ma, { dash: 1 }), S(m.A, m.I, { dash: 1 }));
+    g = g.concat(ABC(m));
+    g.push(P(D, 'D'), P(Ma, 'M'));
+    return g;
+  },
+  verify: function (p) {
+    var m = model(p.a, p.b, p.c);
+    var D = lerp(m.B, m.C, (p.c * p.c) / (p.b * p.b + p.c * p.c));
+    return d2(m.A, D);
+  }
+});
+
+/* ============ 7. Tangents at B and C meet on the symmedian ============ */
+CONFIGS.push({
+  id: 'tangent_pole', tier: 3, topic: 'circles',
+  name: 'The pole of BC: tangents at B, C meet on the A-symmedian',
+  lemma: 'If the tangents to the circumcircle at B and C meet at T, then AT is the A-symmedian, and TB = TC = R·tan A.',
+  gen: function (R) {
+    for (var k = 0; k < 800; k++) {
+      var t = randTri(R, 7, 18);
+      var e = t.b * t.b + t.c * t.c - t.a * t.a;
+      if (Math.abs(e) >= 0.5 * t.b * t.c && t.b !== t.c) return { a: t.a, b: t.b, c: t.c };
+    }
+    return { a: 9, b: 10, c: 17 };
+  },
+  value: function (p) {
+    var a = BigInt(p.a), b = BigInt(p.b), c = BigInt(p.c);
+    var e = b * b + c * c - a * a;
+    return fr(a * a * b * b * c * c, e * e);
+  },
+  quantity: 'TB²',
+  statement: function (p) {
+    return 'Triangle ABC has ' + sides(p) + '. The tangents to the circumcircle of ABC at B and at C meet at T.';
+  },
+  hints: [
+    'T is equidistant from B and C (equal tangents), so T lies on the perpendicular bisector of BC, through O.',
+    'In right triangle OBT, ∠BOT = half of the central angle ∠BOC = A. So TB = R·tan A.',
+    'tan²A = sin²A/cos²A with sin A = a/2R and cos A = (b²+c²−a²)/(2bc): the R\'s cancel nicely.'
+  ],
+  solution: function (p) {
+    var e = p.b * p.b + p.c * p.c - p.a * p.a;
+    return '<p>TB = TC by equal tangents, so T is on line OM<sub>a</sub> (M<sub>a</sub> the midpoint of BC). Since OB ⟂ TB, triangle OBT is right-angled at B, and ∠BOT = ½∠BOC = A. Hence</p>' +
+      '<p class="k">TB = R·tan A</p>' +
+      '<p>Now sin A = a/(2R) and cos A = (b²+c²−a²)/(2bc), so TB² = R²·sin²A/cos²A = R²·(a²/4R²)·(4b²c²)/(b²+c²−a²)²:</p>' +
+      '<p class="k">TB² = a²b²c² / (b² + c² − a²)²</p>' +
+      '<p>Here b²+c²−a² = ' + e + ', so TB² = (' + p.a + '·' + p.b + '·' + p.c + ')² / ' + e + '².</p>' +
+      '<p><em>The same point T is the pole of BC, and AT is the A-symmedian — worth remembering.</em></p>';
+  },
+  figure: function (p) {
+    var m = model(p.a, p.b, p.c), Ma = mid(m.B, m.C);
+    var dvec = [Ma[0] - m.O[0], Ma[1] - m.O[1]], dl = Math.hypot(dvec[0], dvec[1]);
+    var T = [m.O[0] + dvec[0] / dl * (m.R * m.R / dl), m.O[1] + dvec[1] / dl * (m.R * m.R / dl)];
+    var g = [CIR(m.O, m.R, { k: 'main' })];
+    g = g.concat(TRI(m));
+    g.push(S(T, m.B, { k: 'hi' }), S(T, m.C, { k: 'hi' }), S(m.A, T, { dash: 1 }), S(m.O, T, { dash: 1 }));
+    g = g.concat(ABC(m));
+    g.push(P(T, 'T'), P(m.O, 'O'));
+    return g;
+  },
+  verify: function (p) {
+    var m = model(p.a, p.b, p.c), Ma = mid(m.B, m.C);
+    var dvec = [Ma[0] - m.O[0], Ma[1] - m.O[1]], dl = Math.hypot(dvec[0], dvec[1]);
+    var T = [m.O[0] + dvec[0] / dl * (m.R * m.R / dl), m.O[1] + dvec[1] / dl * (m.R * m.R / dl)];
+    return d2(T, m.B);
+  }
+});
+
+/* ============ 8. Bisector meets circumcircle: power of a point ============ */
+CONFIGS.push({
+  id: 'bisector_chord', tier: 2, topic: 'circles',
+  name: 'Bisector chord + power of a point',
+  lemma: 'The internal bisector from A meets BC at D and the circumcircle again at the arc midpoint M; then DB·DC = DA·DM and AD·AM = bc.',
+  gen: function (R) { var t = randTri(R, 8, 20); return { a: t.a, b: t.b, c: t.c }; },
+  value: function (p) {
+    var a = BigInt(p.a), b = BigInt(p.b), c = BigInt(p.c);
+    return fr(a * a * a * a * b * c, (b + c) * (b + c) * (b + c - a) * (a + b + c));
+  },
+  quantity: 'DM²',
+  statement: function (p) {
+    return 'Triangle ABC has ' + sides(p) + '. The internal bisector of ∠A meets BC at D and meets the circumcircle again at M.';
+  },
+  hints: [
+    'First get BD and DC from the angle bisector theorem, then DB·DC by the power of the point D.',
+    'DB·DC = DA·DM, so DM = DB·DC / AD. You still need AD.',
+    'The bisector length satisfies AD² = bc − BD·DC = bc[1 − a²/(b+c)²].'
+  ],
+  solution: function (p) {
+    return '<p>By the bisector theorem BD = ac/(b+c) and DC = ab/(b+c), so DB·DC = a²bc/(b+c)².</p>' +
+      '<p>Triangles ABD and AMC are similar (∠BAD = ∠MAC and ∠ABD = ∠AMC), giving AD·AM = bc; subtracting AD² from both sides of AD·AM = AD² + AD·DM yields the standard bisector length</p>' +
+      '<p class="k">AD² = bc − DB·DC = bc[(b+c)² − a²]/(b+c)²</p>' +
+      '<p>The power of D gives DB·DC = DA·DM, hence DM = DB·DC/AD and</p>' +
+      '<p class="k">DM² = (DB·DC)²/AD² = a⁴bc / [(b+c)²(b+c−a)(a+b+c)]</p>' +
+      '<p>Here b+c = ' + (p.b + p.c) + ', b+c−a = ' + (p.b + p.c - p.a) + ', a+b+c = ' + (p.a + p.b + p.c) + '.</p>';
+  },
+  figure: function (p) {
+    var m = model(p.a, p.b, p.c);
+    var D = lerp(m.B, m.C, p.c / (p.b + p.c));
+    var g = [CIR(m.O, m.R, { k: 'main' })];
+    g = g.concat(TRI(m));
+    g.push(S(m.A, m.M, { dash: 1 }), S(D, m.M, { k: 'hi' }), S(m.M, m.B), S(m.M, m.C));
+    g = g.concat(ABC(m));
+    g.push(P(D, 'D'), P(m.M, 'M'));
+    return g;
+  },
+  verify: function (p) {
+    var m = model(p.a, p.b, p.c);
+    var D = lerp(m.B, m.C, p.c / (p.b + p.c));
+    return d2(D, m.M);
+  }
+});
+
+/* ============ 9. Ptolemy / cyclic quadrilateral diagonal ============ */
+CONFIGS.push({
+  id: 'ptolemy', tier: 2, topic: 'circles',
+  name: 'Ptolemy + the cyclic-quadrilateral diagonal formula',
+  lemma: 'For cyclic ABCD with AB=p, BC=q, CD=r, DA=t: AC·BD = pr + qt (Ptolemy) and AC/BD = (pt+qr)/(pq+rt).',
+  gen: function (R) {
+    for (var k = 0; k < 3000; k++) {
+      var p1 = ri(R, 5, 15), q = ri(R, 5, 15), r = ri(R, 5, 15), t = ri(R, 5, 15);
+      var mx = Math.max(p1, q, r, t), sum = p1 + q + r + t;
+      if (sum - mx <= mx + 2) continue;
+      if (!quadOK(p1, q, r, t)) continue;
+      return { p: p1, q: q, r: r, t: t };
+    }
+    return { p: 7, q: 8, r: 9, t: 10 };
+  },
+  value: function (pp) {
+    var p = BigInt(pp.p), q = BigInt(pp.q), r = BigInt(pp.r), t = BigInt(pp.t);
+    return fr((p * r + q * t) * (p * t + q * r), p * q + r * t);
+  },
+  quantity: 'AC²',
+  statement: function (pp) {
+    return 'Cyclic quadrilateral ABCD (in this order on its circle) has AB = ' + pp.p + ', BC = ' + pp.q + ', CD = ' + pp.r + ', DA = ' + pp.t + '.';
+  },
+  hints: [
+    'Ptolemy gives AC·BD = AB·CD + BC·DA. One equation, two unknowns — you need a second relation between AC and BD.',
+    'Get AC/BD by comparing areas or by the law of cosines: opposite angles of a cyclic quadrilateral are supplementary, so their cosines are negatives.',
+    'AC/BD = (AB·AD + CB·CD)/(BA·BC + DA·DC). Multiply the two relations together to isolate AC².'
+  ],
+  solution: function (pp) {
+    return '<p>Write p = AB, q = BC, r = CD, t = DA. Applying the law of cosines to triangles ABC and ADC (∠B + ∠D = 180°, so cos D = −cos B) and eliminating cos B:</p>' +
+      '<p class="k">AC² = (pr + qt)(pt + qr)/(pq + rt)</p>' +
+      '<p>Symmetrically BD² = (pr+qt)(pq+rt)/(pt+qr), and multiplying the two recovers <b>Ptolemy</b>: AC·BD = pr + qt.</p>' +
+      '<p>Here pr+qt = ' + (pp.p * pp.r + pp.q * pp.t) + ', pt+qr = ' + (pp.p * pp.t + pp.q * pp.r) + ', pq+rt = ' + (pp.p * pp.q + pp.r * pp.t) + '.</p>';
+  },
+  figure: function (pp) {
+    var Q = quadPts(pp.p, pp.q, pp.r, pp.t);
+    var g = [CIR(Q.O, Q.R, { k: 'main' })];
+    g.push(S(Q.A, Q.B, { k: 'main' }), S(Q.B, Q.C, { k: 'main' }), S(Q.C, Q.D, { k: 'main' }), S(Q.D, Q.A, { k: 'main' }));
+    g.push(S(Q.A, Q.C, { k: 'hi' }), S(Q.B, Q.D, { dash: 1 }));
+    g.push(P(Q.A, 'A'), P(Q.B, 'B'), P(Q.C, 'C'), P(Q.D, 'D'));
+    return g;
+  },
+  verify: function (pp) { var Q = quadPts(pp.p, pp.q, pp.r, pp.t); return d2(Q.A, Q.C); }
+});
+/* ---------- cyclic quadrilateral construction (numeric, for figures + checking) ---------- */
+function quadSum(R, s) {
+  var tot = 0;
+  for (var i = 0; i < 4; i++) { var x = s[i] / (2 * R); if (x > 1) return Infinity; tot += 2 * Math.asin(x); }
+  return tot;
+}
+function quadR(p, q, r, t) {
+  var s = [p, q, r, t], lo = Math.max(p, q, r, t) / 2 + 1e-9, hi = 1e7;
+  if (quadSum(lo, s) < 2 * Math.PI) return null;      /* centre would fall outside: reject */
+  for (var i = 0; i < 300; i++) {
+    var mid2 = (lo + hi) / 2, v = quadSum(mid2, s);
+    if (v > 2 * Math.PI) lo = mid2; else hi = mid2;
+  }
+  return (lo + hi) / 2;
+}
+function quadOK(p, q, r, t) {
+  var R = quadR(p, q, r, t);
+  if (!R || !isFinite(R) || R > 400) return false;
+  return true;
+}
+function quadPts(p, q, r, t) {
+  var R = quadR(p, q, r, t), s = [p, q, r, t], th = 0.6, pts = [];
+  for (var i = 0; i < 4; i++) {
+    pts.push([R * Math.cos(th), R * Math.sin(th)]);
+    th += 2 * Math.asin(s[i] / (2 * R));
+  }
+  return { O: [0, 0], R: R, A: pts[0], B: pts[1], C: pts[2], D: pts[3] };
+}
+
+/* ============ 10. Miquel point / PQ² = pow(P) + pow(Q) ============ */
+CONFIGS.push({
+  id: 'miquel_pq', tier: 3, topic: 'circles',
+  name: 'Radical axes: PQ² = pow(P) + pow(Q)',
+  lemma: 'If the opposite sides of a cyclic quadrilateral meet at P and Q, then PQ² = pow(P) + pow(Q); equivalently the circle with diameter PQ is orthogonal to the original circle.',
+  gen: function (R) {
+    for (var k = 0; k < 6000; k++) {
+      var p = ri(R, 5, 13), q = ri(R, 5, 12), r = ri(R, 7, 15), t = ri(R, 7, 15);
+      if (t <= q + 1 || r <= p + 1) continue;
+      var mx = Math.max(p, q, r, t);
+      if (p + q + r + t - mx <= mx + 2) continue;
+      if (!quadOK(p, q, r, t)) continue;
+      var Q = quadPts(p, q, r, t);
+      var PP = meet(Q.A, Q.B, Q.C, Q.D), QQ = meet(Q.A, Q.D, Q.B, Q.C);
+      if (!isFinite(PP[0]) || !isFinite(QQ[0])) continue;
+      if (dist(PP, Q.O) > 4 * Q.R || dist(QQ, Q.O) > 4 * Q.R) continue;
+      return { p: p, q: q, r: r, t: t };
+    }
+    return { p: 5, q: 6, r: 9, t: 10 };
+  },
+  value: function (pp) {
+    var p = BigInt(pp.p), q = BigInt(pp.q), r = BigInt(pp.r), t = BigInt(pp.t);
+    var PB = fr(q * (p * q + r * t), t * t - q * q);
+    var powP = fmul(PB, fadd(PB, fr(p, 1n)));
+    var QA = fr(p * (p * t + q * r), r * r - p * p);
+    var powQ = fmul(QA, fadd(QA, fr(t, 1n)));
+    return fadd(powP, powQ);
+  },
+  quantity: 'PQ²',
+  statement: function (pp) {
+    return 'Cyclic quadrilateral ABCD has AB = ' + pp.p + ', BC = ' + pp.q + ', CD = ' + pp.r + ', DA = ' + pp.t + '. Rays AB and DC meet at P, and rays AD and BC meet at Q.';
+  },
+  hints: [
+    'Both P and Q lie outside the circle ω. Write pow(P) = PB·PA and pow(Q) = QA·QD, and find those lengths from similar triangles.',
+    'Triangles PBC and PDA are similar (ratio BC : DA), and triangles QAB and QCD are similar (ratio AB : CD). Each gives a small linear system.',
+    'For the last step use the famous identity PQ² = pow(P) + pow(Q), which follows since the circle with diameter PQ is orthogonal to ω.'
+  ],
+  solution: function (pp) {
+    var p = pp.p, q = pp.q, r = pp.r, t = pp.t;
+    var PB = q * (p * q + r * t) / (t * t - q * q), QA = p * (p * t + q * r) / (r * r - p * p);
+    return '<p><b>The lemma.</b> Let ω be the circle. The circle with diameter PQ is orthogonal to ω, so if N is the midpoint of PQ then NP² = pow(N). Expanding pow along the line gives the clean identity</p>' +
+      '<p class="k">PQ² = pow(P) + pow(Q)</p>' +
+      '<p><b>The lengths.</b> Since ABCD is cyclic, ∠PBC = ∠PDA, so △PBC ∼ △PDA with ratio q : t. Writing PB = x, PC = y and PA = x + p, PD = y + r gives x/(y+r) = y/(x+p) = q/t, hence</p>' +
+      '<p class="k">PB = q(pq + rt)/(t² − q²) = ' + PB.toFixed(4) + ',&nbsp; pow(P) = PB·(PB + p)</p>' +
+      '<p>Similarly △QAB ∼ △QCD with ratio p : r, so</p>' +
+      '<p class="k">QA = p(pt + qr)/(r² − p²) = ' + QA.toFixed(4) + ',&nbsp; pow(Q) = QA·(QA + t)</p>' +
+      '<p>Add the two powers.</p>';
+  },
+  figure: function (pp) {
+    var Q = quadPts(pp.p, pp.q, pp.r, pp.t);
+    var PP = meet(Q.A, Q.B, Q.C, Q.D), QQ = meet(Q.A, Q.D, Q.B, Q.C);
+    var g = [CIR(Q.O, Q.R, { k: 'main' })];
+    g.push(S(Q.A, Q.B, { k: 'main' }), S(Q.B, Q.C, { k: 'main' }), S(Q.C, Q.D, { k: 'main' }), S(Q.D, Q.A, { k: 'main' }));
+    g.push(S(Q.B, PP, { dash: 1 }), S(Q.C, PP, { dash: 1 }), S(Q.D, QQ, { dash: 1 }), S(Q.C, QQ, { dash: 1 }));
+    g.push(S(PP, QQ, { k: 'hi' }));
+    g.push(P(Q.A, 'A'), P(Q.B, 'B'), P(Q.C, 'C'), P(Q.D, 'D'), P(PP, 'P'), P(QQ, 'Q'));
+    return g;
+  },
+  verify: function (pp) {
+    var Q = quadPts(pp.p, pp.q, pp.r, pp.t);
+    var PP = meet(Q.A, Q.B, Q.C, Q.D), QQ = meet(Q.A, Q.D, Q.B, Q.C);
+    return d2(PP, QQ);
+  }
+});
+
+/* ============ 11. Feuerbach: NI = R/2 − r ============ */
+CONFIGS.push({
+  id: 'feuerbach', tier: 3, topic: 'incenter',
+  name: "Feuerbach's theorem (NI = R/2 − r)",
+  lemma: 'The nine-point circle is internally tangent to the incircle, so the distance from the nine-point centre N to the incenter I equals R/2 − r.',
+  gen: function (R) { var t = randTri(R, 8, 19); return { a: t.a, b: t.b, c: t.c }; },
+  value: function (p) {
+    var a = BigInt(p.a), b = BigInt(p.b), c = BigInt(p.c), T = bigT(p.a, p.b, p.c), s2 = a + b + c;
+    var R2 = fr(a * a * b * b * c * c, T);          /* R^2 */
+    var Rr = fr(a * b * c, 2n * s2);                /* R*r */
+    var r2 = fr(T, 4n * s2 * s2);                   /* r^2 */
+    return fadd(fsub(fdiv(R2, fr(4n)), Rr), r2);
+  },
+  quantity: 'NI²',
+  statement: function (p) {
+    return 'Triangle ABC has ' + sides(p) + '. Let I be the incenter and let N be the center of the nine-point circle.';
+  },
+  hints: [
+    'What is the radius of the nine-point circle, and what does tangency of two circles say about the distance between their centers?',
+    'Feuerbach: the nine-point circle (radius R/2) is internally tangent to the incircle (radius r), so NI = R/2 − r.',
+    'Now just compute R = abc/4K and r = K/s.'
+  ],
+  solution: function (p) {
+    return '<p>The nine-point circle has radius R/2 and, by <b>Feuerbach\'s theorem</b>, is internally tangent to the incircle. For internal tangency the distance between centres is the difference of radii:</p>' +
+      '<p class="k">NI = R/2 − r &nbsp;⟹&nbsp; NI² = R²/4 − Rr + r²</p>' +
+      '<p>With R² = a²b²c²/T, Rr = abc/(2(a+b+c)) and r² = T/(4(a+b+c)²), where T = (a+b+c)(b+c−a)(c+a−b)(a+b−c) = ' + Tval(p.a, p.b, p.c) + ':</p>' +
+      '<p class="k">NI² = a²b²c²/(4T) − abc/(2(a+b+c)) + T/(4(a+b+c)²)</p>';
+  },
+  figure: function (p) {
+    var m = model(p.a, p.b, p.c), g = [];
+    g.push(CIR(m.O, m.R, { dash: 1 }), CIR(m.N, m.R / 2, { k: 'main' }), CIR(m.I, m.r, { k: 'main' }));
+    g = g.concat(TRI(m));
+    g.push(S(m.N, m.I, { k: 'hi' }));
+    g = g.concat(ABC(m));
+    g.push(P(m.N, 'N'), P(m.I, 'I'));
+    return g;
+  },
+  verify: function (p) { var m = model(p.a, p.b, p.c); return d2(m.N, m.I); }
+});
+
+/* ============ 12. Mixtilinear incircle radius ============ */
+CONFIGS.push({
+  id: 'mixtilinear', tier: 3, topic: 'circles',
+  name: 'A-mixtilinear incircle: ρ = r·sec²(A/2)',
+  lemma: 'The A-mixtilinear incircle — tangent to AB and AC and internally tangent to the circumcircle — has its centre on AI and radius ρ<sub>A</sub> = r / cos²(A/2). If it touches AB at X and AC at Y, the incenter I is the midpoint of XY.',
+  gen: function (R) { var t = randTri(R, 8, 19); return { a: t.a, b: t.b, c: t.c }; },
+  value: function (p) {
+    var a = BigInt(p.a), b = BigInt(p.b), c = BigInt(p.c);
+    return fr(4n * b * b * c * c * (c + a - b) * (a + b - c), (b + c - a) * (a + b + c) * (a + b + c) * (a + b + c));
+  },
+  quantity: 'ρ²',
+  statement: function (p) {
+    return 'Triangle ABC has ' + sides(p) + '. Circle ω is tangent to rays AB and AC and is internally tangent to the circumcircle of ABC; let ρ be its radius.';
+  },
+  hints: [
+    'The centre of ω lies on the bisector AI, and the incircle is the other circle tangent to both rays — so the two are homothetic from A.',
+    'A key fact: the incenter I is the midpoint of the chord ω cuts... more useful here — ω passes through I? No: the homothety at the tangency point T maps ω to the circumcircle and I to the arc midpoint M, and it forces ρ = r/cos²(A/2).',
+    'Use cos²(A/2) = s(s−a)/(bc) and r = K/s.'
+  ],
+  solution: function (p) {
+    return '<p>Let ω touch AB at X and the circumcircle at T. The homothety at T carrying ω to the circumcircle sends X to the midpoint of arc AB, and one shows the incenter I is the midpoint of XY (Y the touch point on AC) — the classical mixtilinear lemma.</p>' +
+      '<p>Since AI bisects ∠A and AX = ρ/tan(A/2)... combining AI = r/sin(A/2) with AO<sub>ω</sub> = ρ/sin(A/2) and AI = AO<sub>ω</sub>·cos... the standard result is</p>' +
+      '<p class="k">ρ = r · sec²(A/2) = r·bc / (s(s−a))</p>' +
+      '<p>Squaring with r² = (s−a)(s−b)(s−c)/s gives ρ² = b²c²(s−b)(s−c)/(s³(s−a)), i.e.</p>' +
+      '<p class="k">ρ² = 4b²c²(c+a−b)(a+b−c) / [(b+c−a)(a+b+c)³]</p>' +
+      '<p>Here (c+a−b) = ' + (p.c + p.a - p.b) + ', (a+b−c) = ' + (p.a + p.b - p.c) + ', (b+c−a) = ' + (p.b + p.c - p.a) + ', (a+b+c) = ' + (p.a + p.b + p.c) + '.</p>';
+  },
+  figure: function (p) {
+    var m = model(p.a, p.b, p.c);
+    var rho = Math.sqrt(4 * p.b * p.b * p.c * p.c * (p.c + p.a - p.b) * (p.a + p.b - p.c) / ((p.b + p.c - p.a) * Math.pow(p.a + p.b + p.c, 3)));
+    var A2 = angles(p.a, p.b, p.c)[0] / 2;
+    var u = [(m.I[0] - m.A[0]), (m.I[1] - m.A[1])], ul = Math.hypot(u[0], u[1]);
+    u = [u[0] / ul, u[1] / ul];
+    var dd = rho / Math.sin(A2);
+    var W = [m.A[0] + u[0] * dd, m.A[1] + u[1] * dd];
+    var dv = [W[0] - m.O[0], W[1] - m.O[1]], dl = Math.hypot(dv[0], dv[1]);
+    var Tp = [m.O[0] + dv[0] / dl * m.R, m.O[1] + dv[1] / dl * m.R];
+    var g = [CIR(m.O, m.R, { k: 'main' }), CIR(W, rho, { k: 'hi' }), CIR(m.I, m.r, { dash: 1 })];
+    g = g.concat(TRI(m));
+    g.push(S(m.A, W, { dash: 1 }));
+    g = g.concat(ABC(m));
+    g.push(P(m.I, 'I'), P(Tp, 'T'));
+    return g;
+  },
+  verify: function (p) {
+    /* independent: solve for d on AI with radius d·sin(A/2) internally tangent to circumcircle */
+    var m = model(p.a, p.b, p.c), A2 = angles(p.a, p.b, p.c)[0] / 2;
+    var u = [(m.I[0] - m.A[0]), (m.I[1] - m.A[1])], ul = Math.hypot(u[0], u[1]);
+    u = [u[0] / ul, u[1] / ul];
+    var f = function (d) {
+      var W = [m.A[0] + u[0] * d, m.A[1] + u[1] * d];
+      return dist(m.O, W) - (m.R - d * Math.sin(A2));
+    };
+    var lo = 1e-9, hi = 3 * m.R;
+    for (var i = 0; i < 300; i++) { var md = (lo + hi) / 2; if (f(md) < 0) lo = md; else hi = md; }
+    var d = (lo + hi) / 2, rho = d * Math.sin(A2);
+    return rho * rho;
+  }
+});
+
+/* ============ 13. Excenter distance ============ */
+CONFIGS.push({
+  id: 'excenter', tier: 2, topic: 'incenter',
+  name: 'The A-excircle and AI<sub>A</sub> = s / cos(A/2)',
+  lemma: 'The A-excircle touches line AB at distance s from A, has radius r<sub>A</sub> = K/(s−a), and AI<sub>A</sub>² = s·bc/(s−a).',
+  gen: function (R) { var t = randTri(R, 8, 20); return { a: t.a, b: t.b, c: t.c }; },
+  value: function (p) {
+    var a = BigInt(p.a), b = BigInt(p.b), c = BigInt(p.c);
+    return fr(b * c * (a + b + c), (b + c - a));
+  },
+  quantity: 'AI<sub>A</sub>²',
+  statement: function (p) {
+    return 'Triangle ABC has ' + sides(p) + '. Let I<sub>A</sub> be the center of the excircle opposite A (tangent to side BC and to the extensions of AB and AC).';
+  },
+  hints: [
+    'The A-excircle touches ray AB at a point X. Equal tangents give AX = s — prove that first.',
+    'Then AI<sub>A</sub> = AX / cos(A/2) = s / cos(A/2), since ∠XAI<sub>A</sub> = A/2 and ∠AXI<sub>A</sub> = 90°.',
+    'Finish with cos²(A/2) = s(s−a)/(bc).'
+  ],
+  solution: function (p) {
+    return '<p>Let the A-excircle touch ray AB at X and ray AC at Y. Then AX = AY, and AX = AB + BX = c + (s−c) = s (the tangent lengths from B are s−c).</p>' +
+      '<p>Since I<sub>A</sub>X ⟂ AB and AI<sub>A</sub> bisects ∠A, AI<sub>A</sub> = AX/cos(A/2) = s/cos(A/2). With cos²(A/2) = s(s−a)/bc:</p>' +
+      '<p class="k">AI<sub>A</sub>² = s²·bc/(s(s−a)) = s·bc/(s−a) = bc(a+b+c)/(b+c−a)</p>' +
+      '<p>Here a+b+c = ' + (p.a + p.b + p.c) + ' and b+c−a = ' + (p.b + p.c - p.a) + '.</p>' +
+      '<p><em>Compare with AI² = bc(s−a)/s — the two differ by swapping s and s−a.</em></p>';
+  },
+  figure: function (p) {
+    var m = model(p.a, p.b, p.c);
+    var rA = m.K / (m.s - p.a);
+    var g = [CIR(m.IA, rA, { k: 'main' }), CIR(m.I, m.r, { dash: 1 })];
+    g = g.concat(TRI(m));
+    var X = foot(m.IA, m.A, m.B), Y = foot(m.IA, m.A, m.C);
+    g.push(S(m.A, X, { dash: 1 }), S(m.A, Y, { dash: 1 }), S(m.A, m.IA, { k: 'hi' }));
+    g = g.concat(ABC(m));
+    g.push(P(m.IA, 'I_A'), P(X, 'X'));
+    return g;
+  },
+  verify: function (p) { var m = model(p.a, p.b, p.c); return d2(m.A, m.IA); }
+});
+
+/* ============ 14. Mass points / two cevians ============ */
+CONFIGS.push({
+  id: 'cevian_ratio', tier: 1, topic: 'ratios',
+  name: 'Mass points: the ratio in which two cevians cut each other',
+  lemma: 'If BD : DC = m₁ : n₁ and CE : EA = m₂ : n₂, then AD ∩ BE = P satisfies AP : PD = n₂(m₁+n₁) : m₁m₂.',
+  gen: function (R) {
+    var v = function () { return ri(R, 1, 6); };
+    for (var k = 0; k < 500; k++) {
+      var m1 = v(), n1 = v(), m2 = v(), n2 = v();
+      if (m1 === n1 && m2 === n2) continue;
+      var num1 = n2 * (m1 + n1), den1 = m1 * m2;
+      if (num1 % den1 === 0 && num1 / den1 <= 3) continue;
+      return { m1: m1, n1: n1, m2: m2, n2: n2 };
+    }
+    return { m1: 3, n1: 2, m2: 4, n2: 3 };
+  },
+  value: function (p) {
+    return fr(BigInt(p.n2) * BigInt(p.m1 + p.n1), BigInt(p.m1) * BigInt(p.m2));
+  },
+  quantity: 'AP / PD',
+  statement: function (p) {
+    return 'In triangle ABC, point D lies on segment BC with BD : DC = ' + p.m1 + ' : ' + p.n1 + ', and point E lies on segment CA with CE : EA = ' + p.m2 + ' : ' + p.n2 + '. Segments AD and BE meet at P.';
+  },
+  hints: [
+    'Mass points: put masses at B and C so that D balances, then a mass at A so that E balances.',
+    'Masses: B gets n₁·(something) and C gets m₁·(something); on CA you need mass(C)·CE = mass(A)·EA.',
+    'Once the three masses are fixed, AP : PD = mass(D) : mass(A) = (mass B + mass C) : mass A.'
+  ],
+  solution: function (p) {
+    var m1 = p.m1, n1 = p.n1, m2 = p.m2, n2 = p.n2;
+    return '<p>Use barycentric (or mass-point) coordinates with A = (1,0,0), B = (0,1,0), C = (0,0,1).</p>' +
+      '<p>D on BC with BD : DC = ' + m1 + ' : ' + n1 + ' is D = (0, ' + n1 + ', ' + m1 + '), and E on CA with CE : EA = ' + m2 + ' : ' + n2 + ' is E = (' + m2 + ', 0, ' + n2 + ').</p>' +
+      '<p>A point of line AD has the form (t, ' + n1 + ', ' + m1 + '); a point of line BE has the form (' + m2 + ', u, ' + n2 + '). Matching up to scale gives</p>' +
+      '<p class="k">P = (m₁m₂ : n₁n₂ : m₁n₂) = (' + (m1 * m2) + ' : ' + (n1 * n2) + ' : ' + (m1 * n2) + ')</p>' +
+      '<p>In normalized barycentrics the A-coordinate of P is the "weight of A", and AP : PD = (sum of the other two) : (A-coordinate):</p>' +
+      '<p class="k">AP : PD = n₂(m₁+n₁) : m₁m₂ = ' + (n2 * (m1 + n1)) + ' : ' + (m1 * m2) + '</p>';
+  },
+  figure: function (p) {
+    var m = model(14, 13, 15);
+    var D = lerp(m.B, m.C, p.m1 / (p.m1 + p.n1));
+    var E = lerp(m.C, m.A, p.m2 / (p.m2 + p.n2));
+    var PP = meet(m.A, D, m.B, E);
+    var g = TRI(m).slice();
+    g.push(S(m.A, D, { k: 'hi' }), S(m.B, E, { k: 'hi' }));
+    g = g.concat(ABC(m));
+    g.push(P(D, 'D'), P(E, 'E'), P(PP, 'P'));
+    return g;
+  },
+  verify: function (p) {
+    var m = model(14, 13, 15);
+    var D = lerp(m.B, m.C, p.m1 / (p.m1 + p.n1));
+    var E = lerp(m.C, m.A, p.m2 / (p.m2 + p.n2));
+    var PP = meet(m.A, D, m.B, E);
+    return dist(m.A, PP) / dist(PP, D);
+  }
+});
+
+/* ============ 15. Orthic triangle side ============ */
+CONFIGS.push({
+  id: 'orthic', tier: 2, topic: 'orthocenter',
+  name: 'Orthic triangle: EF = a·cos A',
+  lemma: 'If E, F are the feet of the altitudes from B and C, then AEHF is cyclic with diameter AH, triangle AEF ∼ triangle ABC with ratio cos A, and EF = a·cos A.',
+  gen: function (R) {
+    for (var k = 0; k < 900; k++) {
+      var t = randTri(R, 8, 20);
+      var A = angles(t.a, t.b, t.c);
+      if (Math.max(A[0], A[1], A[2]) < 85 * Math.PI / 180 && Math.abs(t.b * t.b + t.c * t.c - t.a * t.a) >= 10) return { a: t.a, b: t.b, c: t.c };
+    }
+    return { a: 13, b: 14, c: 15 };
+  },
+  value: function (p) {
+    var a = BigInt(p.a), b = BigInt(p.b), c = BigInt(p.c);
+    var e = b * b + c * c - a * a;
+    return fr(a * a * e * e, 4n * b * b * c * c);
+  },
+  quantity: 'EF²',
+  statement: function (p) {
+    return 'Acute triangle ABC has ' + sides(p) + '. The altitudes from B and from C have feet E (on CA) and F (on AB).';
+  },
+  hints: [
+    'BE ⟂ AC and CF ⟂ AB mean ∠BEC = ∠BFC = 90°, so BCEF is cyclic — what circle?',
+    'BCEF is cyclic with diameter BC, so ∠AEF = ∠ABC: triangles AEF and ABC are similar.',
+    'The ratio of similarity is AE/AB = cos A, so EF = a·cos A.'
+  ],
+  solution: function (p) {
+    var e = p.b * p.b + p.c * p.c - p.a * p.a;
+    return '<p>Since ∠BEC = ∠BFC = 90°, the points B, C, E, F lie on the circle with diameter BC. Hence ∠AEF = 180° − ∠FEC = ∠ABC, so</p>' +
+      '<p class="k">△AEF ∼ △ABC with ratio AE/AB = (b·cos A)/c · (c/b) = cos A</p>' +
+      '<p>(directly: AE = c·cos A and AF = b·cos A, so AE/AC = AF/AB = cos A). Therefore EF = a·cos A and</p>' +
+      '<p class="k">EF² = a²cos²A = a²(b²+c²−a²)²/(4b²c²)</p>' +
+      '<p>Here b²+c²−a² = ' + e + ' and 4b²c² = ' + (4 * p.b * p.b * p.c * p.c) + '.</p>';
+  },
+  figure: function (p) {
+    var m = model(p.a, p.b, p.c);
+    var E = foot(m.B, m.C, m.A), F = foot(m.C, m.A, m.B), D = foot(m.A, m.B, m.C);
+    var g = [CIR(mid(m.B, m.C), p.a / 2, { dash: 1 })];
+    g = g.concat(TRI(m));
+    g.push(S(m.B, E, { dash: 1 }), S(m.C, F, { dash: 1 }), S(m.A, D, { dash: 1 }), S(E, F, { k: 'hi' }));
+    g = g.concat(ABC(m));
+    g.push(P(E, 'E'), P(F, 'F'), P(m.H, 'H'));
+    return g;
+  },
+  verify: function (p) {
+    var m = model(p.a, p.b, p.c);
+    var E = foot(m.B, m.C, m.A), F = foot(m.C, m.A, m.B);
+    return d2(E, F);
+  }
+});
+
+/* ============ 16. Median length ============ */
+CONFIGS.push({
+  id: 'median', tier: 1, topic: 'ratios',
+  name: 'Median length / Apollonius',
+  lemma: 'For the median to BC: 4m_a² = 2b² + 2c² − a². The centroid divides it 2 : 1.',
+  gen: function (R) { var t = randTri(R, 7, 22); return { a: t.a, b: t.b, c: t.c }; },
+  value: function (p) {
+    var a = BigInt(p.a), b = BigInt(p.b), c = BigInt(p.c);
+    return fr(4n * (2n * b * b + 2n * c * c - a * a), 36n);   /* AG^2 = (2/3 m_a)^2 */
+  },
+  quantity: 'AG²',
+  statement: function (p) {
+    return 'Triangle ABC has ' + sides(p) + ', and G is its centroid.';
+  },
+  hints: [
+    'Let M be the midpoint of BC. Apply Stewart\'s theorem (or the law of cosines twice) to get AM².',
+    'Apollonius: AB² + AC² = 2AM² + 2BM², i.e. 4AM² = 2b² + 2c² − a².',
+    'The centroid cuts the median 2 : 1 from the vertex, so AG = (2/3)AM.'
+  ],
+  solution: function (p) {
+    return '<p>With M the midpoint of BC, Apollonius\' theorem (the law of cosines at B and at C, added) gives</p>' +
+      '<p class="k">4·AM² = 2b² + 2c² − a² = ' + (2 * p.b * p.b + 2 * p.c * p.c - p.a * p.a) + '</p>' +
+      '<p>The centroid divides each median in ratio 2 : 1 from the vertex, so AG = (2/3)AM and</p>' +
+      '<p class="k">AG² = (4/9)·AM² = (2b² + 2c² − a²)/9</p>';
+  },
+  figure: function (p) {
+    var m = model(p.a, p.b, p.c);
+    var Ma = mid(m.B, m.C), Mb = mid(m.C, m.A), Mc = mid(m.A, m.B);
+    var G = [(m.A[0] + m.B[0] + m.C[0]) / 3, (m.A[1] + m.B[1] + m.C[1]) / 3];
+    var g = TRI(m).slice();
+    g.push(S(m.A, Ma, { k: 'hi' }), S(m.B, Mb, { dash: 1 }), S(m.C, Mc, { dash: 1 }));
+    g = g.concat(ABC(m));
+    g.push(P(G, 'G'), P(Ma, 'M'));
+    return g;
+  },
+  verify: function (p) {
+    var m = model(p.a, p.b, p.c);
+    var G = [(m.A[0] + m.B[0] + m.C[0]) / 3, (m.A[1] + m.B[1] + m.C[1]) / 3];
+    return d2(m.A, G);
+  }
+});
+
+/* ============ 17. Radical axis / common chord ============ */
+CONFIGS.push({
+  id: 'radaxis', tier: 1, topic: 'circles',
+  name: 'Radical axis and the common chord',
+  lemma: 'The radical axis of two intersecting circles is their common chord; it is perpendicular to the line of centers at distance (d²+r₁²−r₂²)/(2d) from O₁.',
+  gen: function (R) {
+    for (var k = 0; k < 900; k++) {
+      var r1 = ri(R, 5, 17), r2 = ri(R, 5, 17), d = ri(R, 4, 24);
+      if (d <= Math.abs(r1 - r2) + 1) continue;
+      if (d >= r1 + r2 - 1) continue;
+      return { r1: r1, r2: r2, d: d };
+    }
+    return { r1: 10, r2: 13, d: 9 };
+  },
+  value: function (p) {
+    var r1 = BigInt(p.r1), r2 = BigInt(p.r2), d = BigInt(p.d);
+    var e = d * d + r1 * r1 - r2 * r2;
+    return fsub(fr(4n * r1 * r1, 1n), fr(e * e, d * d));
+  },
+  quantity: 'XY²',
+  statement: function (p) {
+    return 'Circles ω₁ and ω₂ have radii ' + p.r1 + ' and ' + p.r2 + ', and their centers are ' + p.d + ' apart. They meet at two points X and Y.';
+  },
+  hints: [
+    'XY is the radical axis, so it is perpendicular to O₁O₂; let it cross O₁O₂ at Z.',
+    'Write O₁Z = x. Then r₁² − x² = ZX² = r₂² − (d−x)², which pins down x.',
+    'x = (d² + r₁² − r₂²)/(2d), and XY = 2·√(r₁² − x²).'
+  ],
+  solution: function (p) {
+    var e = p.d * p.d + p.r1 * p.r1 - p.r2 * p.r2;
+    return '<p>XY ⟂ O₁O₂; let them meet at Z with O₁Z = x. Then ZX² = r₁² − x² and also ZX² = r₂² − (d−x)². Setting these equal,</p>' +
+      '<p class="k">x = (d² + r₁² − r₂²)/(2d) = ' + e + '/' + (2 * p.d) + '</p>' +
+      '<p>(This x is exactly the statement that Z lies on the radical axis: equal powers.) Then</p>' +
+      '<p class="k">XY² = 4(r₁² − x²) = 4r₁² − (d² + r₁² − r₂²)²/d²</p>';
+  },
+  figure: function (p) {
+    var O1 = [0, 0], O2 = [p.d, 0];
+    var x = (p.d * p.d + p.r1 * p.r1 - p.r2 * p.r2) / (2 * p.d);
+    var h = Math.sqrt(Math.max(p.r1 * p.r1 - x * x, 0));
+    var X = [x, h], Y = [x, -h];
+    return [CIR(O1, p.r1, { k: 'main' }), CIR(O2, p.r2, { k: 'main' }),
+      S(O1, O2, { dash: 1 }), S(X, Y, { k: 'hi' }),
+      P(O1, 'O₁'), P(O2, 'O₂'), P(X, 'X'), P(Y, 'Y')];
+  },
+  verify: function (p) {
+    var x = (p.d * p.d + p.r1 * p.r1 - p.r2 * p.r2) / (2 * p.d);
+    var h = Math.sqrt(Math.max(p.r1 * p.r1 - x * x, 0));
+    return 4 * h * h;
+  }
+});
+
+/* ============ 18. Tangent at A meets BC: the harmonic point ============ */
+CONFIGS.push({
+  id: 'tangent_a', tier: 3, topic: 'circles',
+  name: 'Tangent at A meets BC (harmonic conjugate)',
+  lemma: 'If the tangent at A meets line BC at X, then XB : XC = c² : b², XA² = XB·XC, and (B, C; D, X) is harmonic where D is the foot of the A-bisector.',
+  gen: function (R) {
+    for (var k = 0; k < 900; k++) {
+      var t = randTri(R, 7, 19);
+      var e = Math.abs(t.b * t.b - t.c * t.c);
+      if (e < 24) continue;
+      var far = t.a * Math.max(t.b * t.b, t.c * t.c) / e;   /* distance from the far vertex to X */
+      if (far > 2.0 * t.a) continue;
+      return { a: t.a, b: t.b, c: t.c };
+    }
+    return { a: 14, b: 13, c: 15 };
+  },
+  value: function (p) {
+    var a = BigInt(p.a), b = BigInt(p.b), c = BigInt(p.c);
+    var e = b * b - c * c; if (e < 0n) e = -e;
+    return fr(a * a * b * b * c * c, e * e);
+  },
+  quantity: 'XA²',
+  statement: function (p) {
+    return 'Triangle ABC has ' + sides(p) + '. The tangent to the circumcircle of ABC at A meets line BC at X.';
+  },
+  hints: [
+    'The tangent–chord angle gives ∠XAB = ∠ACB. Which two triangles does that make similar?',
+    '△XAB ∼ △XCA with ratio AB : CA = c : b. So XB/XA = XA/XC = c/b, hence XB : XC = c² : b².',
+    'XA² is the power of X, i.e. XA² = XB·XC, and XC − XB = a (X lies outside the segment, on the side of the shorter of b, c).'
+  ],
+  solution: function (p) {
+    var e = Math.abs(p.b * p.b - p.c * p.c);
+    return '<p>By the tangent–chord angle, ∠XAB = ∠ACB, and ∠X is common, so <b>△XAB ∼ △XCA</b> with ratio AB : CA = c : b. Hence</p>' +
+      '<p class="k">XB/XA = XA/XC = c/b &nbsp;⟹&nbsp; XB : XC = c² : b²</p>' +
+      '<p>Since X is outside segment BC, |XC − XB| = a, so XB = ac²/|b²−c²| and XC = ab²/|b²−c²|. The power of X gives XA² = XB·XC:</p>' +
+      '<p class="k">XA² = a²b²c² / (b² − c²)²</p>' +
+      '<p>Here |b²−c²| = ' + e + '.</p>' +
+      '<p><em>Bonus: X is the harmonic conjugate of the bisector foot D with respect to B and C, and XA is tangent — this is the standard setup for the "A-Apollonius circle".</em></p>';
+  },
+  figure: function (p) {
+    var m = model(p.a, p.b, p.c);
+    var tdir = [-(m.A[1] - m.O[1]), (m.A[0] - m.O[0])];
+    var X = meet(m.A, [m.A[0] + tdir[0], m.A[1] + tdir[1]], m.B, m.C);
+    var D = lerp(m.B, m.C, p.c / (p.b + p.c));
+    var g = [CIR(m.O, m.R, { k: 'main' })];
+    g = g.concat(TRI(m));
+    g.push(S(X, m.A, { k: 'hi' }), S(X, m.C, { dash: 1 }), S(m.A, D, { dash: 1 }));
+    g = g.concat(ABC(m));
+    g.push(P(X, 'X'), P(D, 'D'));
+    return g;
+  },
+  verify: function (p) {
+    var m = model(p.a, p.b, p.c);
+    var tdir = [-(m.A[1] - m.O[1]), (m.A[0] - m.O[0])];
+    var X = meet(m.A, [m.A[0] + tdir[0], m.A[1] + tdir[1]], m.B, m.C);
+    return d2(X, m.A);
+  }
+});
+/* ---------- topics + tiers ---------- */
+var TOPICS = {
+  incenter: 'Incenter / incircle',
+  orthocenter: 'Orthocenter / Euler line',
+  circles: 'Circles & power of a point',
+  ratios: 'Ratios & cevians'
+};
+var TIERS = { 1: 'Warm-up', 2: 'AIME', 3: 'Olympiad config', 4: 'Wild' };
+
+function byId(id) { for (var i = 0; i < CONFIGS.length; i++) if (CONFIGS[i].id === id) return CONFIGS[i]; return null; }
+
+var DEFAULT_CAP = 2000000n;
+function acceptable(v, cfg) {
+  if (v.n <= 0n) return false;
+  var cap = cfg && cfg.cap ? BigInt(cfg.cap) : DEFAULT_CAP;
+  if (v.n + v.d > cap) return false;
+  return true;
+}
+
+/* Build one problem from a config id + seed. Deterministic. */
+function makeProblem(cfgId, seed) {
+  var cfg = byId(cfgId);
+  if (!cfg) return null;
+  var R = rng(seed >>> 0);
+  var p = null, v = null;
+  for (var k = 0; k < 400; k++) {
+    p = cfg.gen(R);
+    try { v = cfg.value(p); } catch (e) { continue; }
+    if (acceptable(v, cfg)) break;
+    v = null;
+  }
+  if (!v) { p = cfg.gen(rng(12345)); v = cfg.value(p); }
+  var isInt = fint(v);
+  var answer = isInt ? v.n : (v.n + v.d);
+  var ask = isInt
+    ? 'Find ' + cfg.quantity + '.'
+    : cfg.quantity + ' can be written as m/n, where m and n are relatively prime positive integers. Find m + n.';
+  return {
+    cfgId: cfg.id, name: cfg.name, lemma: cfg.lemma, tier: cfg.tier, topic: cfg.topic,
+    seed: seed >>> 0, params: p, quantity: cfg.quantity,
+    statement: cfg.statement(p), ask: ask,
+    exact: fstr(v), approx: fnum(v), isInt: isInt,
+    answer: answer.toString(),
+    hints: cfg.hints, solution: cfg.solution(p), figure: cfg.figure(p)
+  };
+}
+
+function randomProblem(filterIds, seed) {
+  var ids = (filterIds && filterIds.length) ? filterIds : CONFIGS.map(function (c) { return c.id; });
+  if (seed === undefined) seed = (Math.random() * 4294967296) >>> 0;
+  var R = rng(seed);
+  var id = ids[Math.floor(R() * ids.length)];
+  return makeProblem(id, (Math.floor(R() * 4294967296)) >>> 0);
+}
+
+return {
+  CONFIGS: CONFIGS, TOPICS: TOPICS, TIERS: TIERS,
+  makeProblem: makeProblem, randomProblem: randomProblem, byId: byId,
+  fr: fr, fstr: fstr, fnum: fnum, model: model, rng: rng, dist: dist, d2: d2,
+  fadd: fadd, fsub: fsub, fmul: fmul, fdiv: fdiv, fint: fint, shapely: shapely, angles: angles
+};
+}));
+
+</script>
+<script>
+/* ===================================================================
+   WILD MODE - unbounded problem generation by random construction.
+
+   Every base triangle is Heronian (integer sides, integer area), so the
+   vertices have RATIONAL coordinates.  Every construction below keeps
+   coordinates rational, so answers are exact m/n - computed, never guessed.
+   =================================================================== */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory(require('./core.js'));
+  else root.WILD = factory(root.GEO);
+}(typeof self !== 'undefined' ? self : this, function (GEO) {
+'use strict';
+
+var fr = GEO.fr, qa = GEO.fadd, qs = GEO.fsub, qm = GEO.fmul, qd = GEO.fdiv;
+var Q0 = fr(0), Q1 = fr(1), Q2 = fr(2);
+function qi(n) { return fr(n); }
+function qz(f) { return f.n === 0n; }
+function qneg(f) { return fr(-f.n, f.d); }
+function qnum(f) { return Number(f.n) / Number(f.d); }
+function qbig(f) { var n = f.n < 0n ? -f.n : f.n; return n > 100000000000000n || f.d > 100000000000000n; }
+
+/* ---------- points, lines, circles over Q ---------- */
+function pt(x, y) { return { x: x, y: y }; }
+function sub(P, Q) { return pt(qs(P.x, Q.x), qs(P.y, Q.y)); }
+function add2(P, Q) { return pt(qa(P.x, Q.x), qa(P.y, Q.y)); }
+function scal(k, P) { return pt(qm(k, P.x), qm(k, P.y)); }
+function dot(u, v) { return qa(qm(u.x, v.x), qm(u.y, v.y)); }
+function cross(u, v) { return qs(qm(u.x, v.y), qm(u.y, v.x)); }
+function dd(P, Q) { var u = sub(P, Q); return dot(u, u); }
+function samePt(P, Q) { return qz(qs(P.x, Q.x)) && qz(qs(P.y, Q.y)); }
+function linePP(P, Q) {
+  var a = qs(Q.y, P.y), b = qs(P.x, Q.x);
+  if (qz(a) && qz(b)) return null;
+  return { a: a, b: b, c: qa(qm(a, P.x), qm(b, P.y)) };
+}
+function meetLL(l1, l2) {
+  var det = qs(qm(l1.a, l2.b), qm(l2.a, l1.b));
+  if (qz(det)) return null;
+  return pt(qd(qs(qm(l1.c, l2.b), qm(l2.c, l1.b)), det), qd(qs(qm(l1.a, l2.c), qm(l2.a, l1.c)), det));
+}
+function perpThrough(l, P) { var a = qneg(l.b), b = l.a; return { a: a, b: b, c: qa(qm(a, P.x), qm(b, P.y)) }; }
+function paraThrough(l, P) { return { a: l.a, b: l.b, c: qa(qm(l.a, P.x), qm(l.b, P.y)) }; }
+function footOn(P, l) { return meetLL(l, perpThrough(l, P)); }
+function reflectLine(P, l) { var F = footOn(P, l); if (!F) return null; return sub(scal(Q2, F), P); }
+function midOf(P, Q) { return scal(qd(Q1, Q2), add2(P, Q)); }
+function reflectPt(P, Q) { return sub(scal(Q2, Q), P); }
+function perpBis(P, Q) {
+  return { a: qm(Q2, qs(Q.x, P.x)), b: qm(Q2, qs(Q.y, P.y)), c: qs(dot(Q, Q), dot(P, P)) };
+}
+function circ3(P, Q, R) {
+  var O = meetLL(perpBis(P, Q), perpBis(Q, R));
+  if (!O) return null;
+  return { o: O, r2: dd(O, P) };
+}
+function onCircle(C, P) { return qz(qs(dd(C.o, P), C.r2)); }
+function secondOn(C, P, Q) {          /* P must be on C; line PQ meets C again */
+  var d = sub(Q, P), n2 = dot(d, d);
+  if (qz(n2)) return null;
+  var t = qd(qm(qi(-2), dot(d, sub(P, C.o))), n2);
+  if (qz(t)) return null;             /* tangent */
+  return add2(P, scal(t, d));
+}
+function tangentAt(C, P) { var n = sub(P, C.o); return { a: n.x, b: n.y, c: dot(n, P) }; }
+function poleOf(C, l) {
+  var k = qs(l.c, qa(qm(l.a, C.o.x), qm(l.b, C.o.y)));
+  if (qz(k)) return null;
+  var lam = qd(C.r2, k);
+  return add2(C.o, pt(qm(lam, l.a), qm(lam, l.b)));
+}
+function radAxis(C1, C2) {
+  var a = qm(Q2, qs(C2.o.x, C1.o.x)), b = qm(Q2, qs(C2.o.y, C1.o.y));
+  if (qz(a) && qz(b)) return null;
+  var c = qs(qs(dot(C2.o, C2.o), C2.r2), qs(dot(C1.o, C1.o), C1.r2));
+  return { a: a, b: b, c: c };
+}
+function orthoOf(A, B, C) {
+  var l1 = linePP(B, C), l2 = linePP(C, A);
+  if (!l1 || !l2) return null;
+  return meetLL(perpThrough(l1, A), perpThrough(l2, B));
+}
+function centroidOf(A, B, C) { return scal(qd(Q1, qi(3)), add2(add2(A, B), C)); }
+function areaX2(P, Q, R) { var v = cross(sub(Q, P), sub(R, P)); return v.n < 0n ? qneg(v) : v; }
+function collinear3(P, Q, R) { return qz(cross(sub(Q, P), sub(R, P))); }
+function concyclic4(P, Q, R, S) {     /* exact 4x4 determinant */
+  var rows = [P, Q, R, S].map(function (X) { return [dot(X, X), X.x, X.y, Q1]; });
+  return qz(det4(rows));
+}
+function det4(m) {
+  var s = Q0;
+  for (var j = 0; j < 4; j++) {
+    var sub3 = [];
+    for (var i = 1; i < 4; i++) { var r = []; for (var k = 0; k < 4; k++) if (k !== j) r.push(m[i][k]); sub3.push(r); }
+    var term = qm(m[0][j], det3(sub3));
+    s = (j % 2 === 0) ? qa(s, term) : qs(s, term);
+  }
+  return s;
+}
+function det3(m) {
+  var t1 = qm(m[0][0], qs(qm(m[1][1], m[2][2]), qm(m[1][2], m[2][1])));
+  var t2 = qm(m[0][1], qs(qm(m[1][0], m[2][2]), qm(m[1][2], m[2][0])));
+  var t3 = qm(m[0][2], qs(qm(m[1][0], m[2][1]), qm(m[1][1], m[2][0])));
+  return qa(qs(t1, t2), t3);
+}
+
+/* ---------- Heronian triangle supply ---------- */
+function isqrt(n) { if (n < 0) return -1; var r = Math.round(Math.sqrt(n)); return r * r === n ? r : -1; }
+var HERON = null;
+function heronList() {
+  if (HERON) return HERON;
+  var out = [];
+  for (var a = 4; a <= 100; a++) for (var b = a + 1; b <= 100; b++) for (var c = b + 1; c <= 100; c++) {
+    if (a + b <= c) continue;
+    if (a + b + c > 170) continue;
+    var T = (a + b + c) * (-a + b + c) * (a - b + c) * (a + b - c);
+    if (isqrt(T) < 0) continue;
+    if (!GEO.shapely(a, b, c, 25, 130)) continue;   /* scalene only: symmetry breeds fake coincidences */
+    if (a * a + b * b === c * c) continue;           /* right angles collapse O, H onto the triangle */
+    out.push([a, b, c]);
+  }
+  HERON = out;
+  return out;
+}
+
+/* ---------- build the base frame ---------- */
+function baseFrame(a, b, c) {
+  /* BC = a, CA = b, AB = c ; B=(0,0), C=(a,0), A=(x,y) with y rational */
+  var T = (a + b + c) * (-a + b + c) * (a - b + c) * (a + b - c);
+  var s = isqrt(T);
+  if (s < 0) return null;
+  var B = pt(Q0, Q0), C = pt(qi(a), Q0);
+  var x = qd(qi(a * a + c * c - b * b), qi(2 * a));
+  var y = qd(qi(s), qi(2 * a));
+  return { A: pt(x, y), B: B, C: C, a: a, b: b, c: c };
+}
+
+/* ---------- construction context ---------- */
+var LABELS = ['M','N','P','Q','R','S','T','U','V','W','X','Y','Z','D','E','F','J','K','L'];
+var CLABS = ['ω₁','ω₂','ω₃','ω₄'];
+
+function newCtx(fr0) {
+  return { f: fr0, pts: [], circs: [], text: [], coll: [], eq: [], ops: [], used: {}, cused: 0, scale: fr0.a };
+}
+function label(ctx) {
+  for (var i = 0; i < LABELS.length; i++) if (!ctx.used[LABELS[i]]) { ctx.used[LABELS[i]] = 1; return LABELS[i]; }
+  return 'Z' + (ctx.pts.length);
+}
+function idxOf(ctx, n) { for (var i = 0; i < ctx.pts.length; i++) if (ctx.pts[i].n === n) return i; return 99; }
+function pr(ctx, n1, n2) { return idxOf(ctx, n1) <= idxOf(ctx, n2) ? n1 + n2 : n2 + n1; }
+function tri3(ctx, a, b2, c) {
+  var v = [a, b2, c].sort(function (x, y) { return idxOf(ctx, x) - idxOf(ctx, y); });
+  return v[0] + v[1] + v[2];
+}
+function nameP(ctx, n) { for (var i = 0; i < ctx.pts.length; i++) if (ctx.pts[i].n === n) return ctx.pts[i]; return null; }
+function addPt(ctx, P, n, parents) {
+  if (!P) return null;
+  if (qbig(P.x) || qbig(P.y)) return null;
+  var lim = 7 * ctx.scale;
+  if (Math.abs(qnum(P.x)) > lim || Math.abs(qnum(P.y)) > lim) return null;
+  for (var i = 0; i < ctx.pts.length; i++) if (samePt(ctx.pts[i].p, P)) return null;
+  var e = { n: n || label(ctx), p: P, par: parents || [] };
+  ctx.pts.push(e);
+  return e;
+}
+function addColl(ctx, names) {
+  for (var i = 0; i < ctx.coll.length; i++) {
+    var g = ctx.coll[i], hit = 0;
+    for (var j = 0; j < names.length; j++) if (g.indexOf(names[j]) >= 0) hit++;
+    if (hit >= 2) { names.forEach(function (n) { if (g.indexOf(n) < 0) g.push(n); }); return; }
+  }
+  ctx.coll.push(names.slice());
+}
+function knownColl(ctx, a, b, c) {
+  for (var i = 0; i < ctx.coll.length; i++) {
+    var g = ctx.coll[i];
+    if (g.indexOf(a) >= 0 && g.indexOf(b) >= 0 && g.indexOf(c) >= 0) return true;
+  }
+  return false;
+}
+function segKey(a, b) { return a < b ? a + b : b + a; }
+function addEq(ctx, a, b, c, d) { ctx.eq.push([segKey(a, b), segKey(c, d)]); }
+function addCirc(ctx, C, on, txtName) {
+  if (!C || qbig(C.o.x) || qbig(C.o.y) || qbig(C.r2)) return null;
+  if (qz(C.r2)) return null;
+  for (var i = 0; i < ctx.circs.length; i++)
+    if (samePt(ctx.circs[i].c.o, C.o) && qz(qs(ctx.circs[i].c.r2, C.r2))) return null;
+  var nm = txtName || CLABS[ctx.cused++] || ('ω' + ctx.circs.length);
+  var e = { n: nm, c: C, on: on.slice() };
+  ctx.circs.push(e);
+  return e;
+}
+function onList(ctx, ce) { return ce.on; }
+
+/* ---------- moves ---------- */
+function rint(R, n) { return Math.floor(R() * n); }
+function some(R, arr, k) {
+  var a = arr.slice(), out = [];
+  while (out.length < k && a.length) out.push(a.splice(rint(R, a.length), 1)[0]);
+  return out.length === k ? out : null;
+}
+
+var MOVES = [
+  { id: 'mid', w: 9, go: function (ctx, R) {
+      var s = some(R, ctx.pts, 2); if (!s) return null;
+      var e = addPt(ctx, midOf(s[0].p, s[1].p), null, [s[0].n, s[1].n]);
+      if (!e) return null;
+      addColl(ctx, [s[0].n, s[1].n, e.n]); addEq(ctx, e.n, s[0].n, e.n, s[1].n);
+      ctx.ops.push({ id: 'mid', out: e.n, a: [s[0].n, s[1].n] });
+      return 'Let ' + e.n + ' be the midpoint of ' + pr(ctx, s[0].n, s[1].n) + '.';
+    } },
+  { id: 'foot', w: 11, go: function (ctx, R) {
+      var s = some(R, ctx.pts, 3); if (!s) return null;
+      var l = linePP(s[1].p, s[2].p); if (!l) return null;
+      if (collinear3(s[0].p, s[1].p, s[2].p)) return null;
+      var e = addPt(ctx, footOn(s[0].p, l), null, [s[1].n, s[2].n]);
+      if (!e) return null;
+      addColl(ctx, [s[1].n, s[2].n, e.n]);
+      ctx.ops.push({ id: 'foot', out: e.n, a: [s[0].n, s[1].n, s[2].n] });
+      return 'Let ' + e.n + ' be the foot of the perpendicular from ' + s[0].n + ' to line ' + pr(ctx, s[1].n, s[2].n) + '.';
+    } },
+  { id: 'reflL', w: 9, go: function (ctx, R) {
+      var s = some(R, ctx.pts, 3); if (!s) return null;
+      var l = linePP(s[1].p, s[2].p); if (!l) return null;
+      if (collinear3(s[0].p, s[1].p, s[2].p)) return null;
+      var e = addPt(ctx, reflectLine(s[0].p, l), null, [s[0].n]);
+      if (!e) return null;
+      ctx.ops.push({ id: 'reflL', out: e.n, a: [s[0].n, s[1].n, s[2].n] });
+      return 'Let ' + e.n + ' be the reflection of ' + s[0].n + ' in line ' + pr(ctx, s[1].n, s[2].n) + '.';
+    } },
+  { id: 'reflP', w: 4, go: function (ctx, R) {
+      var s = some(R, ctx.pts, 2); if (!s) return null;
+      var e = addPt(ctx, reflectPt(s[0].p, s[1].p), null, [s[0].n, s[1].n]);
+      if (!e) return null;
+      addColl(ctx, [s[0].n, s[1].n, e.n]); addEq(ctx, s[1].n, s[0].n, s[1].n, e.n);
+      ctx.ops.push({ id: 'reflP', out: e.n, a: [s[0].n, s[1].n] });
+      return 'Let ' + e.n + ' be the reflection of ' + s[0].n + ' over ' + s[1].n + '.';
+    } },
+  { id: 'meet', w: 12, go: function (ctx, R) {
+      var s = some(R, ctx.pts, 4); if (!s) return null;
+      var l1 = linePP(s[0].p, s[1].p), l2 = linePP(s[2].p, s[3].p);
+      if (!l1 || !l2) return null;
+      var e = addPt(ctx, meetLL(l1, l2), null, [s[0].n, s[1].n, s[2].n, s[3].n]);
+      if (!e) return null;
+      addColl(ctx, [s[0].n, s[1].n, e.n]); addColl(ctx, [s[2].n, s[3].n, e.n]);
+      ctx.ops.push({ id: 'meet', out: e.n, a: [s[0].n, s[1].n, s[2].n, s[3].n] });
+      return 'Lines ' + pr(ctx, s[0].n, s[1].n) + ' and ' + pr(ctx, s[2].n, s[3].n) + ' meet at ' + e.n + '.';
+    } },
+  { id: 'second', w: 16, go: function (ctx, R) {
+      if (!ctx.circs.length) return null;
+      var ce = ctx.circs[rint(R, ctx.circs.length)];
+      var onN = some(R, ce.on, 1); if (!onN) return null;
+      var Pe = nameP(ctx, onN[0]);
+      var others = ctx.pts.filter(function (q) { return q.n !== Pe.n; });
+      var Qe = some(R, others, 1); if (!Qe) return null;
+      var X = secondOn(ce.c, Pe.p, Qe[0].p);
+      var e = addPt(ctx, X, null, [Pe.n, Qe[0].n]);
+      if (!e) return null;
+      ce.on.push(e.n);
+      addColl(ctx, [Pe.n, Qe[0].n, e.n]);
+      ctx.ops.push({ id: 'second', out: e.n, a: [Pe.n, Qe[0].n], c: ce.n });
+      return 'Line ' + pr(ctx, Pe.n, Qe[0].n) + ' meets ' + ce.n + ' again at ' + e.n + '.';
+    } },
+  { id: 'circum', w: 13, go: function (ctx, R) {
+      var s = some(R, ctx.pts, 3); if (!s) return null;
+      if (collinear3(s[0].p, s[1].p, s[2].p)) return null;
+      var C = circ3(s[0].p, s[1].p, s[2].p);
+      var e = addCirc(ctx, C, [s[0].n, s[1].n, s[2].n]);
+      if (!e) return null;
+      ctx.ops.push({ id: 'circum', out: e.n, a: [s[0].n, s[1].n, s[2].n], isCirc: 1 });
+      return 'Let ' + e.n + ' be the circle through ' + s[0].n + ', ' + s[1].n + ' and ' + s[2].n + '.';
+    } },
+  { id: 'tangmeet', w: 11, go: function (ctx, R) {
+      var cs = ctx.circs.filter(function (c) { return c.on.length >= 2; });
+      if (!cs.length) return null;
+      var ce = cs[rint(R, cs.length)];
+      var s = some(R, ce.on, 2); if (!s) return null;
+      var P1 = nameP(ctx, s[0]).p, P2 = nameP(ctx, s[1]).p;
+      var ch = linePP(P1, P2); if (!ch) return null;
+      var e = addPt(ctx, poleOf(ce.c, ch), null, [s[0], s[1]]);
+      if (!e) return null;
+      addEq(ctx, e.n, s[0], e.n, s[1]);
+      ctx.ops.push({ id: 'tang', out: e.n, a: [s[0], s[1]], c: ce.n });
+      return 'The tangents to ' + ce.n + ' at ' + s[0] + ' and at ' + s[1] + ' meet at ' + e.n + '.';
+    } },
+  { id: 'antipode', w: 6, go: function (ctx, R) {
+      if (!ctx.circs.length) return null;
+      var ce = ctx.circs[rint(R, ctx.circs.length)];
+      var s = some(R, ce.on, 1); if (!s) return null;
+      var Pe = nameP(ctx, s[0]);
+      var e = addPt(ctx, reflectPt(Pe.p, ce.c.o), null, [Pe.n]);
+      if (!e) return null;
+      ce.on.push(e.n);
+      for (var zz = 0; zz < ctx.pts.length; zz++) if (samePt(ctx.pts[zz].p, ce.c.o)) addColl(ctx, [Pe.n, ctx.pts[zz].n, e.n]);
+      ctx.ops.push({ id: 'anti', out: e.n, a: [Pe.n], c: ce.n });
+      return 'Let ' + e.n + ' be the point of ' + ce.n + ' diametrically opposite ' + Pe.n + '.';
+    } },
+  { id: 'ortho', w: 8, go: function (ctx, R) {
+      var s = some(R, ctx.pts, 3); if (!s) return null;
+      if (collinear3(s[0].p, s[1].p, s[2].p)) return null;
+      var e = addPt(ctx, orthoOf(s[0].p, s[1].p, s[2].p), null, [s[0].n, s[1].n, s[2].n]);
+      if (!e) return null;
+      ctx.ops.push({ id: 'ortho', out: e.n, a: [s[0].n, s[1].n, s[2].n] });
+      return 'Let ' + e.n + ' be the orthocenter of triangle ' + tri3(ctx, s[0].n, s[1].n, s[2].n) + '.';
+    } },
+  { id: 'circumcenter', w: 8, go: function (ctx, R) {
+      var s = some(R, ctx.pts, 3); if (!s) return null;
+      if (collinear3(s[0].p, s[1].p, s[2].p)) return null;
+      var C = circ3(s[0].p, s[1].p, s[2].p);
+      var e = addPt(ctx, C.o, null, [s[0].n, s[1].n, s[2].n]);
+      if (!e) return null;
+      addEq(ctx, e.n, s[0].n, e.n, s[1].n); addEq(ctx, e.n, s[1].n, e.n, s[2].n);
+      ctx.ops.push({ id: 'ccen', out: e.n, a: [s[0].n, s[1].n, s[2].n] });
+      return 'Let ' + e.n + ' be the circumcenter of triangle ' + tri3(ctx, s[0].n, s[1].n, s[2].n) + '.';
+    } },
+  { id: 'centroid', w: 4, go: function (ctx, R) {
+      var s = some(R, ctx.pts, 3); if (!s) return null;
+      if (collinear3(s[0].p, s[1].p, s[2].p)) return null;
+      var e = addPt(ctx, centroidOf(s[0].p, s[1].p, s[2].p), null, [s[0].n, s[1].n, s[2].n]);
+      if (!e) return null;
+      ctx.ops.push({ id: 'cent', out: e.n, a: [s[0].n, s[1].n, s[2].n] });
+      return 'Let ' + e.n + ' be the centroid of triangle ' + tri3(ctx, s[0].n, s[1].n, s[2].n) + '.';
+    } },
+  { id: 'miquel', w: 11, go: function (ctx, R) {
+      if (ctx.circs.length < 2) return null;
+      var s = some(R, ctx.circs, 2); if (!s) return null;
+      var c1 = s[0], c2 = s[1];
+      var shared = c1.on.filter(function (n) { return c2.on.indexOf(n) >= 0; });
+      if (!shared.length) return null;
+      var Pe = nameP(ctx, shared[0]);
+      var axis = linePP(c1.c.o, c2.c.o);
+      if (!axis) return null;
+      var e = addPt(ctx, reflectLine(Pe.p, axis), null, [Pe.n]);
+      if (!e) return null;
+      c1.on.push(e.n); c2.on.push(e.n);
+      ctx.ops.push({ id: 'miq', out: e.n, a: [Pe.n], cc: [c1.n, c2.n] });
+      return 'Circles ' + c1.n + ' and ' + c2.n + ' meet again at ' + e.n + '.';
+    } },
+  { id: 'radmeet', w: 7, go: function (ctx, R) {
+      if (ctx.circs.length < 2) return null;
+      var s = some(R, ctx.circs, 2); if (!s) return null;
+      var ax = radAxis(s[0].c, s[1].c); if (!ax) return null;
+      var pp = some(R, ctx.pts, 2); if (!pp) return null;
+      var l = linePP(pp[0].p, pp[1].p); if (!l) return null;
+      var e = addPt(ctx, meetLL(ax, l), null, [pp[0].n, pp[1].n]);
+      if (!e) return null;
+      addColl(ctx, [pp[0].n, pp[1].n, e.n]);
+      ctx.ops.push({ id: 'rad', out: e.n, a: [pp[0].n, pp[1].n], cc: [s[0].n, s[1].n] });
+      return 'The radical axis of ' + s[0].n + ' and ' + s[1].n + ' meets line ' + pr(ctx, pp[0].n, pp[1].n) + ' at ' + e.n + '.';
+    } },
+  { id: 'para', w: 4, go: function (ctx, R) {
+      var s = some(R, ctx.pts, 5); if (!s) return null;
+      var base = linePP(s[1].p, s[2].p), tgt = linePP(s[3].p, s[4].p);
+      if (!base || !tgt) return null;
+      var e = addPt(ctx, meetLL(paraThrough(base, s[0].p), tgt), null, [s[3].n, s[4].n]);
+      if (!e) return null;
+      addColl(ctx, [s[3].n, s[4].n, e.n]);
+      ctx.ops.push({ id: 'para', out: e.n, a: [s[0].n, s[1].n, s[2].n, s[3].n, s[4].n] });
+      return 'The line through ' + s[0].n + ' parallel to ' + pr(ctx, s[1].n, s[2].n) + ' meets line ' + pr(ctx, s[3].n, s[4].n) + ' at ' + e.n + '.';
+    } },
+  { id: 'perp', w: 5, go: function (ctx, R) {
+      var s = some(R, ctx.pts, 5); if (!s) return null;
+      var base = linePP(s[1].p, s[2].p), tgt = linePP(s[3].p, s[4].p);
+      if (!base || !tgt) return null;
+      var e = addPt(ctx, meetLL(perpThrough(base, s[0].p), tgt), null, [s[3].n, s[4].n]);
+      if (!e) return null;
+      addColl(ctx, [s[3].n, s[4].n, e.n]);
+      ctx.ops.push({ id: 'perp', out: e.n, a: [s[0].n, s[1].n, s[2].n, s[3].n, s[4].n] });
+      return 'The line through ' + s[0].n + ' perpendicular to ' + pr(ctx, s[1].n, s[2].n) + ' meets line ' + pr(ctx, s[3].n, s[4].n) + ' at ' + e.n + '.';
+    } }
+];
+
+/* ---------- cevian family: bisectors, medians, symmedians, isogonal conjugates ----------
+   These need the side lengths as rationals, so they act on the base triangle ABC,
+   whose sides are integers by construction.                                          */
+function cevianSetup(ctx, R) {
+  var f = ctx.f;
+  var V = [
+    { v: 'A', p: 'B', q: 'C', vp: f.c, vq: f.b, ang: '∠BAC', side: 'BC' },
+    { v: 'B', p: 'C', q: 'A', vp: f.a, vq: f.c, ang: '∠ABC', side: 'CA' },
+    { v: 'C', p: 'A', q: 'B', vp: f.b, vq: f.a, ang: '∠BCA', side: 'AB' }
+  ];
+  return V[rint(R, 3)];
+}
+function ptOf(ctx, n) { var e = nameP(ctx, n); return e && e.p; }
+
+MOVES.push(
+  { id: 'bisfoot', w: 12, go: function (ctx, R) {
+      var s = cevianSetup(ctx, R);
+      var P = ptOf(ctx, s.p), Qp = ptOf(ctx, s.q);
+      if (!P || !Qp) return null;
+      var w = qi(s.vp + s.vq);
+      var D = pt(qd(qa(qm(qi(s.vq), P.x), qm(qi(s.vp), Qp.x)), w),
+                 qd(qa(qm(qi(s.vq), P.y), qm(qi(s.vp), Qp.y)), w));
+      var e = addPt(ctx, D, null, [s.p, s.q]);
+      if (!e) return null;
+      addColl(ctx, [s.p, s.q, e.n]);
+      ctx.ops.push({ id: 'bisfoot', out: e.n, a: [s.v, s.p, s.q], r: [s.vp, s.vq] });
+      return 'The internal bisector of ' + s.ang + ' meets ' + s.side + ' at ' + e.n + '.';
+    } },
+  { id: 'extbis', w: 6, go: function (ctx, R) {
+      var s = cevianSetup(ctx, R);
+      if (s.vp === s.vq) return null;
+      var P = ptOf(ctx, s.p), Qp = ptOf(ctx, s.q);
+      if (!P || !Qp) return null;
+      var w = qi(s.vp - s.vq);
+      var D = pt(qd(qs(qm(qi(s.vp), Qp.x), qm(qi(s.vq), P.x)), w),
+                 qd(qs(qm(qi(s.vp), Qp.y), qm(qi(s.vq), P.y)), w));
+      var e = addPt(ctx, D, null, [s.p, s.q]);
+      if (!e) return null;
+      addColl(ctx, [s.p, s.q, e.n]);
+      ctx.ops.push({ id: 'extbis', out: e.n, a: [s.v, s.p, s.q], r: [s.vp, s.vq] });
+      return 'The external bisector of ' + s.ang + ' meets line ' + s.side + ' at ' + e.n + '.';
+    } },
+  { id: 'symfoot', w: 11, go: function (ctx, R) {
+      var s = cevianSetup(ctx, R);
+      var P = ptOf(ctx, s.p), Qp = ptOf(ctx, s.q);
+      if (!P || !Qp) return null;
+      var p2 = s.vp * s.vp, q2 = s.vq * s.vq, w = qi(p2 + q2);
+      var D = pt(qd(qa(qm(qi(q2), P.x), qm(qi(p2), Qp.x)), w),
+                 qd(qa(qm(qi(q2), P.y), qm(qi(p2), Qp.y)), w));
+      var e = addPt(ctx, D, null, [s.p, s.q]);
+      if (!e) return null;
+      addColl(ctx, [s.p, s.q, e.n]);
+      ctx.ops.push({ id: 'symfoot', out: e.n, a: [s.v, s.p, s.q], r: [s.vp, s.vq] });
+      return 'The ' + s.v + '-symmedian meets ' + s.side + ' at ' + e.n + '.';
+    } },
+  { id: 'medsec', w: 9, go: function (ctx, R) {
+      if (!ctx.circs.length) return null;
+      var ce = ctx.circs[0];
+      if (['A', 'B', 'C'].some(function (n) { return ce.on.indexOf(n) < 0; })) return null;
+      var s = cevianSetup(ctx, R);
+      var V = ptOf(ctx, s.v), P = ptOf(ctx, s.p), Qp = ptOf(ctx, s.q);
+      if (!V || !P || !Qp) return null;
+      var X = secondOn(ce.c, V, midOf(P, Qp));
+      var e = addPt(ctx, X, null, [s.v]);
+      if (!e) return null;
+      ce.on.push(e.n);
+      ctx.ops.push({ id: 'medsec', out: e.n, a: [s.v, s.p, s.q], c: ce.n });
+      return 'The median from ' + s.v + ' meets ' + ce.n + ' again at ' + e.n + '.';
+    } },
+  { id: 'isog', w: 8, go: function (ctx, R) {
+      var f = ctx.f, A = ptOf(ctx, 'A'), B = ptOf(ctx, 'B'), C = ptOf(ctx, 'C');
+      var cand = ctx.pts.filter(function (z) { return ['A', 'B', 'C'].indexOf(z.n) < 0; });
+      if (!cand.length) return null;
+      var Pe = cand[rint(R, cand.length)], P = Pe.p;
+      var al = cross(sub(B, P), sub(C, P)), be = cross(sub(C, P), sub(A, P)), ga = cross(sub(A, P), sub(B, P));
+      if (qz(al) || qz(be) || qz(ga)) return null;          /* P on a side line */
+      var a2 = qi(f.a * f.a), b2 = qi(f.b * f.b), c2 = qi(f.c * f.c);
+      var u = qm(a2, qm(be, ga)), v = qm(b2, qm(ga, al)), w = qm(c2, qm(al, be));
+      var t = qa(qa(u, v), w);
+      if (qz(t)) return null;
+      var Qp = pt(qd(qa(qa(qm(u, A.x), qm(v, B.x)), qm(w, C.x)), t),
+                  qd(qa(qa(qm(u, A.y), qm(v, B.y)), qm(w, C.y)), t));
+      var e = addPt(ctx, Qp, null, [Pe.n]);
+      if (!e) return null;
+      ctx.ops.push({ id: 'isog', out: e.n, a: [Pe.n] });
+      return 'Let ' + e.n + ' be the isogonal conjugate of ' + Pe.n + ' with respect to triangle ABC.';
+    } }
+);
+
+/* ---------- exact verification: every constructed point must satisfy its defining property ---------- */
+function ptOfC(ctx, n) { var e = nameP(ctx, n); return e && e.p; }
+function nameC(ctx, n) { for (var i = 0; i < ctx.circs.length; i++) if (ctx.circs[i].n === n) return ctx.circs[i]; return null; }
+function onLine(X, P, Q) { return collinear3(P, Q, X); }
+function perpOK(u, v) { return qz(dot(u, v)); }
+function distToSide2(P, U, V) {           /* squared distance from P to line UV, exact */
+  var l = linePP(U, V);
+  var r = qs(qa(qm(l.a, P.x), qm(l.b, P.y)), l.c);
+  return qd(qm(r, r), qa(qm(l.a, l.a), qm(l.b, l.b)));
+}
+function verifyCtx(ctx) {
+  var g = function (n) { var e = nameP(ctx, n); return e && e.p; };
+  for (var i = 0; i < ctx.ops.length; i++) {
+    var op = ctx.ops[i], a = op.a, X = op.isCirc ? null : g(op.out), ok = true;
+    switch (op.id) {
+      case 'mid': ok = samePt(scal(Q2, X), add2(g(a[0]), g(a[1]))); break;
+      case 'reflP': ok = samePt(add2(X, g(a[0])), scal(Q2, g(a[1]))); break;
+      case 'cent': ok = samePt(scal(qi(3), X), add2(add2(g(a[0]), g(a[1])), g(a[2]))); break;
+      case 'foot': ok = onLine(X, g(a[1]), g(a[2])) && perpOK(sub(X, g(a[0])), sub(g(a[2]), g(a[1]))); break;
+      case 'reflL': {
+        var M = midOf(X, g(a[0]));
+        ok = onLine(M, g(a[1]), g(a[2])) && perpOK(sub(X, g(a[0])), sub(g(a[2]), g(a[1])));
+        break;
+      }
+      case 'meet': ok = onLine(X, g(a[0]), g(a[1])) && onLine(X, g(a[2]), g(a[3])); break;
+      case 'second': {
+        var C = nameC(ctx, op.c);
+        ok = onCircle(C.c, X) && onLine(X, g(a[0]), g(a[1]));
+        break;
+      }
+      case 'omegaSeed':
+      case 'circum': {
+        var Ce = nameC(ctx, op.out);
+        ok = onCircle(Ce.c, g(a[0])) && onCircle(Ce.c, g(a[1])) && onCircle(Ce.c, g(a[2]));
+        break;
+      }
+      case 'tang': {
+        var C2 = nameC(ctx, op.c), P1 = g(a[0]), P2 = g(a[1]);
+        ok = perpOK(sub(X, P1), sub(P1, C2.c.o)) && perpOK(sub(X, P2), sub(P2, C2.c.o));
+        break;
+      }
+      case 'anti': {
+        var C3 = nameC(ctx, op.c);
+        ok = onCircle(C3.c, X) && samePt(midOf(X, g(a[0])), C3.c.o);
+        break;
+      }
+      case 'ortho':
+        ok = perpOK(sub(X, g(a[0])), sub(g(a[1]), g(a[2]))) && perpOK(sub(X, g(a[1])), sub(g(a[2]), g(a[0])));
+        break;
+      case 'ccen':
+        ok = qz(qs(dd(X, g(a[0])), dd(X, g(a[1])))) && qz(qs(dd(X, g(a[1])), dd(X, g(a[2]))));
+        break;
+      case 'miq': {
+        var Ca = nameC(ctx, op.cc[0]), Cb = nameC(ctx, op.cc[1]);
+        ok = onCircle(Ca.c, X) && onCircle(Cb.c, X);
+        break;
+      }
+      case 'rad': {
+        var Cx = nameC(ctx, op.cc[0]), Cy = nameC(ctx, op.cc[1]);
+        var p1 = qs(dd(X, Cx.c.o), Cx.c.r2), p2 = qs(dd(X, Cy.c.o), Cy.c.r2);
+        ok = qz(qs(p1, p2)) && onLine(X, g(a[0]), g(a[1]));
+        break;
+      }
+      case 'para':
+        ok = onLine(X, g(a[3]), g(a[4])) && qz(cross(sub(X, g(a[0])), sub(g(a[2]), g(a[1]))));
+        break;
+      case 'perp':
+        ok = onLine(X, g(a[3]), g(a[4])) && perpOK(sub(X, g(a[0])), sub(g(a[2]), g(a[1])));
+        break;
+      case 'incenter': {
+        var A0 = g(a[0]), B0 = g(a[1]), C0 = g(a[2]);
+        var d1 = distToSide2(X, B0, C0), d2x = distToSide2(X, C0, A0), d3 = distToSide2(X, A0, B0);
+        ok = qz(qs(d1, d2x)) && qz(qs(d2x, d3));
+        break;
+      }
+      case 'medsec': {
+        var Cm = nameC(ctx, op.c);
+        ok = onCircle(Cm.c, X) && onLine(X, g(op.a[0]), midOf(g(op.a[1]), g(op.a[2])));
+        break;
+      }
+      case 'bisfoot': case 'extbis': case 'symfoot': {
+        var Pp = g(op.a[1]), Qq = g(op.a[2]);
+        var m = (op.id === 'symfoot') ? [op.r[0] * op.r[0], op.r[1] * op.r[1]] : [op.r[0], op.r[1]];
+        /* X on line PQ, and PX : XQ = m0 : m1 (compare squares to stay rational) */
+        var lhs = qm(dd(Pp, X), qi(m[1] * m[1])), rhs = qm(dd(X, Qq), qi(m[0] * m[0]));
+        var between = cross(sub(X, Pp), sub(X, Qq));   /* collinear, so use the dot test */
+        var side = dot(sub(X, Pp), sub(X, Qq));
+        ok = onLine(X, Pp, Qq) && qz(qs(lhs, rhs)) &&
+             (op.id === 'extbis' ? side.n > 0n : side.n < 0n);
+        break;
+      }
+      case 'isog': {
+        var A1 = g('A'), B1 = g('B'), C1 = g('C'), Pi = g(op.a[0]);
+        var eqAng = function (V, U1, U2) {          /* ∠(U1 V P) = ∠(Q V U2) exactly */
+          var l = qm(cross(sub(U1, V), sub(Pi, V)), dot(sub(X, V), sub(U2, V)));
+          var r2 = qm(cross(sub(X, V), sub(U2, V)), dot(sub(U1, V), sub(Pi, V)));
+          return qz(qs(l, r2));
+        };
+        ok = eqAng(A1, B1, C1) && eqAng(B1, C1, A1) && eqAng(C1, A1, B1);
+        break;
+      }
+      default: ok = true;
+    }
+    if (!ok) return op.id + ':' + op.out;
+  }
+  return null;
+}
+
+/* ---------- coincidence detection (exact) ---------- */
+/* first record the facts that follow immediately from the construction, so they
+   are not reported back to the solver as "hidden structure" */
+function eqClasses(ctx) {
+  var parent = {};
+  var find = function (x) { while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; };
+  var uni = function (x, y) {
+    if (parent[x] === undefined) parent[x] = x;
+    if (parent[y] === undefined) parent[y] = y;
+    var rx = find(x), ry = find(y);
+    if (rx !== ry) parent[rx] = ry;
+  };
+  ctx.eq.forEach(function (e) { uni(e[0], e[1]); });
+  return { find: function (k) { return parent[k] === undefined ? k : find(k); } };
+}
+
+function expandKnown(ctx) {
+  /* a reflection in a line preserves the distance from every point of that line */
+  ctx.ops.forEach(function (o) {
+    if (o.id !== 'reflL') return;
+    var src = o.a[0], L1 = o.a[1], L2 = o.a[2];
+    ctx.pts.forEach(function (Z) {
+      if (Z.n === src || Z.n === o.out) return;
+      if (Z.n === L1 || Z.n === L2 || knownColl(ctx, L1, L2, Z.n) || collinear3(ptOfC(ctx, L1), ptOfC(ctx, L2), Z.p))
+        addEq(ctx, Z.n, src, Z.n, o.out);
+    });
+  });
+  /* every point of a circle is equidistant from a named centre */
+  ctx.circs.forEach(function (ce) {
+    var Cn = null;
+    ctx.pts.forEach(function (Z) { if (samePt(Z.p, ce.c.o)) Cn = Z.n; });
+    if (!Cn) return;
+    for (var i = 0; i < ce.on.length; i++) for (var j = i + 1; j < ce.on.length; j++)
+      addEq(ctx, Cn, ce.on[i], Cn, ce.on[j]);
+  });
+  if (nameP(ctx, 'I')) {
+    ctx.ops.forEach(function (o) {
+      if (o.id === 'bisfoot') addColl(ctx, [o.a[0], 'I', o.out]);
+    });
+  }
+  ctx.ops.forEach(function (o) {
+    if (o.id === 'medsec') {
+      var m = null;
+      ctx.ops.forEach(function (om) {
+        if (om.id !== 'mid') return;
+        if (om.a.indexOf(o.a[1]) >= 0 && om.a.indexOf(o.a[2]) >= 0) m = om.out;
+      });
+      if (m) addColl(ctx, [o.a[0], m, o.out]);
+    }
+  });
+  ctx.ops.forEach(function (oc) {
+    if (oc.id !== 'cent') return;
+    ctx.ops.forEach(function (om) {
+      if (om.id !== 'mid') return;
+      var t = oc.a, m = om.a;
+      if (t.indexOf(m[0]) < 0 || t.indexOf(m[1]) < 0) return;
+      var third = t.filter(function (n) { return n !== m[0] && n !== m[1]; })[0];
+      if (third) addColl(ctx, [third, oc.out, om.out]);
+    });
+  });
+  ctx.ops.forEach(function (o) {
+    if (o.id !== 'reflP') return;
+    var P = nameP(ctx, o.a[0]), Cc = nameP(ctx, o.a[1]), X = nameP(ctx, o.out);
+    if (!P || !Cc || !X) return;
+    ctx.circs.forEach(function (ce) {
+      if (samePt(ce.c.o, Cc.p) && ce.on.indexOf(P.n) >= 0 && ce.on.indexOf(X.n) < 0) ce.on.push(X.n);
+    });
+  });
+}
+
+function findNotes(ctx) {
+  expandKnown(ctx);
+  var EQ = eqClasses(ctx);
+  var P = ctx.pts, notes = [], i, j, k, l;
+  for (i = 0; i < P.length; i++) for (j = i + 1; j < P.length; j++) for (k = j + 1; k < P.length; k++) {
+    if (!collinear3(P[i].p, P[j].p, P[k].p)) continue;
+    if (knownColl(ctx, P[i].n, P[j].n, P[k].n)) continue;
+    notes.push({ t: 'coll', s: P[i].n + ', ' + P[j].n + ' and ' + P[k].n + ' are collinear', rank: 1 });
+  }
+  for (i = 0; i < ctx.pts.length; i++) for (j = 0; j < ctx.circs.length; j++) {
+    if (ctx.circs[j].on.indexOf(P[i].n) >= 0) continue;
+    if (onCircle(ctx.circs[j].c, P[i].p)) {
+      notes.push({ t: 'on', s: P[i].n + ' lies on ' + ctx.circs[j].n, rank: 1 });
+      ctx.circs[j].on.push(P[i].n);      /* so the concyclicity pass does not restate it */
+    }
+  }
+  if (notes.length < 3) {
+    for (i = 0; i < P.length; i++) for (j = i + 1; j < P.length; j++)
+      for (k = j + 1; k < P.length; k++) for (l = k + 1; l < P.length; l++) {
+        if (collinear3(P[i].p, P[j].p, P[k].p) || collinear3(P[i].p, P[j].p, P[l].p) ||
+            collinear3(P[i].p, P[k].p, P[l].p) || collinear3(P[j].p, P[k].p, P[l].p)) continue;
+        if (!concyclic4(P[i].p, P[j].p, P[k].p, P[l].p)) continue;
+        var nm = [P[i].n, P[j].n, P[k].n, P[l].n], known = false;
+        for (var m = 0; m < ctx.circs.length; m++) {
+          var on = ctx.circs[m].on;
+          if (nm.every(function (x) { return on.indexOf(x) >= 0; })) known = true;
+        }
+        if (known) continue;
+        notes.push({ t: 'cyc', s: nm.join(', ') + ' are concyclic', rank: 2 });
+      }
+  }
+  if (notes.length < 3) {
+    for (i = 0; i < P.length; i++) for (j = i + 1; j < P.length; j++)
+      for (k = 0; k < P.length; k++) for (l = k + 1; l < P.length; l++) {
+        if (k < i || (k === i && l <= j)) continue;
+        if (P[k].n === P[i].n || P[k].n === P[j].n || P[l].n === P[i].n || P[l].n === P[j].n) continue;
+        if (!qz(qs(dd(P[i].p, P[j].p), dd(P[k].p, P[l].p)))) continue;
+        if (EQ.find(segKey(P[i].n, P[j].n)) === EQ.find(segKey(P[k].n, P[l].n))) continue;
+        notes.push({ t: 'eq', s: P[i].n + P[j].n + ' = ' + P[k].n + P[l].n, rank: 3 });
+      }
+  }
+  notes.sort(function (x, y) { return x.rank - y.rank; });
+  return notes.slice(0, 3);
+}
+
+/* ---------- targets ---------- */
+function chooseTarget(ctx, R) {
+  var P = ctx.pts, late = P.slice(3), tries = 0;
+  var base = ['A', 'B', 'C'];
+  while (tries++ < 160) {
+    var roll = R();
+    if (roll < 0.70 && late.length) {
+      var X = late[rint(R, late.length)];
+      var pool = P.filter(function (q) { return q.n !== X.n; });
+      var Y = pool[rint(R, pool.length)];
+      var v = dd(X.p, Y.p);
+      if (qz(v)) continue;
+      return { v: v, q: X.n + Y.n + '²', kind: 'd2', pts: [X.n, Y.n] };
+    } else if (roll < 0.88) {
+      var s = some(R, P, 3); if (!s) continue;
+      var ar = areaX2(s[0].p, s[1].p, s[2].p);
+      if (qz(ar)) continue;
+      var base2 = areaX2(nameP(ctx, 'A').p, nameP(ctx, 'B').p, nameP(ctx, 'C').p);
+      if (s.every(function (z) { return base.indexOf(z.n) >= 0; })) continue;
+      return { v: qd(ar, base2), q: '[' + s[0].n + s[1].n + s[2].n + '] / [ABC]', kind: 'area', pts: [s[0].n, s[1].n, s[2].n] };
+    } else if (roll < 0.94 && ctx.circs.length > 1) {
+      var ce = ctx.circs[1 + rint(R, ctx.circs.length - 1)];
+      return { v: ce.c.r2, q: 'the square of the radius of ' + ce.n, kind: 'r2', circ: ce.n };
+    } else if (late.length >= 2) {
+      var s1 = some(R, late, 2), s2 = some(R, P, 2);
+      if (!s1 || !s2) continue;
+      var n1 = dd(s1[0].p, s1[1].p), n2 = dd(s2[0].p, s2[1].p);
+      if (qz(n1) || qz(n2) || (s1[0].n === s2[0].n && s1[1].n === s2[1].n)) continue;
+      return { v: qd(n1, n2), q: s1[0].n + s1[1].n + '² / ' + s2[0].n + s2[1].n + '²', kind: 'ratio',
+               pts: [s1[0].n, s1[1].n, s2[0].n, s2[1].n] };
+    }
+  }
+  return null;
+}
+
+/* ---------- the generator ---------- */
+function seedCtx(ctx, R) {
+  var f = ctx.f;
+  ['A', 'B', 'C'].forEach(function (n) { ctx.used[n] = 1; });
+  ctx.pts.push({ n: 'A', p: f.A, par: [] }, { n: 'B', p: f.B, par: [] }, { n: 'C', p: f.C, par: [] });
+  var W = circ3(f.A, f.B, f.C);
+  addCirc(ctx, W, ['A', 'B', 'C'], '\u03C9');
+  ctx.head = 'Triangle ABC has BC = ' + f.a + ', CA = ' + f.b + ', AB = ' + f.c + '.';
+  ctx.ops.push({ id: 'omegaSeed', out: '\u03C9', a: ['A', 'B', 'C'], isCirc: 1, seed: 1,
+    text: 'Let \u03C9 be the circumcircle of ABC.' });
+  var opts = [
+    { n: 'I', make: function () {
+        var w = qi(f.a + f.b + f.c);
+        return pt(qd(qa(qa(qm(qi(f.a), f.A.x), qm(qi(f.b), f.B.x)), qm(qi(f.c), f.C.x)), w),
+                  qd(qa(qa(qm(qi(f.a), f.A.y), qm(qi(f.b), f.B.y)), qm(qi(f.c), f.C.y)), w));
+      }, t: 'Let I be the incenter of ABC.', op: 'incenter' },
+    { n: 'H', make: function () { return orthoOf(f.A, f.B, f.C); },
+      t: 'Let H be the orthocenter of ABC.', op: 'ortho' },
+    { n: 'O', make: function () { return W.o; },
+      t: 'Let O be the circumcenter of ABC.', op: 'ccen' },
+    { n: 'G', make: function () { return centroidOf(f.A, f.B, f.C); },
+      t: 'Let G be the centroid of ABC.', op: 'cent' }
+  ];
+  var chosen = [];
+  for (var t = 0; t < 40 && chosen.length < 2; t++) {
+    var o = opts[rint(R, opts.length)];
+    if (chosen.indexOf(o) < 0) chosen.push(o);
+  }
+  chosen.forEach(function (o) {
+    var Pp = o.make();
+    if (!Pp) return;
+    ctx.used[o.n] = 1;
+    var e = addPt(ctx, Pp, o.n, []);
+    if (!e) return;
+    ctx.ops.push({ id: o.op, out: o.n, a: ['A', 'B', 'C'], seed: 1, text: o.t });
+    if (o.n === 'O') { addEq(ctx, 'O', 'A', 'O', 'B'); addEq(ctx, 'O', 'B', 'O', 'C'); }
+  });
+}
+
+/* keep only the steps the question actually depends on */
+function prune(ctx, tg) {
+  var need = {};
+  (tg.pts || []).forEach(function (n) { need[n] = 1; });
+  if (tg.circ) need[tg.circ] = 1;
+  for (var i = ctx.ops.length - 1; i >= 0; i--) {
+    var op = ctx.ops[i];
+    if (!need[op.out]) continue;
+    op.keep = 1;
+    (op.a || []).forEach(function (n) { need[n] = 1; });
+    if (op.c) need[op.c] = 1;
+    if (op.cc) op.cc.forEach(function (n) { need[n] = 1; });
+  }
+  ctx.ops = ctx.ops.filter(function (o) { return o.keep; });
+  var keepP = {A: 1, B: 1, C: 1};
+  ctx.ops.forEach(function (o) { if (!o.isCirc) keepP[o.out] = 1; });
+  Object.keys(need).forEach(function (n) { keepP[n] = 1; });
+  ctx.pts = ctx.pts.filter(function (e) { return keepP[e.n]; });
+  var keepC = {};
+  ctx.ops.forEach(function (o) { if (o.isCirc) keepC[o.out] = 1; });
+  ctx.circs = ctx.circs.filter(function (ce) { return keepC[ce.n]; });
+  ctx.circs.forEach(function (ce) {
+    ce.on = ce.on.filter(function (n) { return keepP[n]; });
+  });
+  return ctx.ops.filter(function (o) { return o.id !== 'omegaSeed'; }).length;
+}
+
+function build(seed) {
+  var R = GEO.rng(seed >>> 0);
+  var H = heronList();
+  var tri = H[rint(R, H.length)].slice();
+  for (var s = tri.length - 1; s > 0; s--) { var j = rint(R, s + 1); var t = tri[s]; tri[s] = tri[j]; tri[j] = t; }
+  var f = baseFrame(tri[0], tri[1], tri[2]);
+  if (!f) return null;
+  var ctx = newCtx(f);
+  seedCtx(ctx, R);
+  var steps = 5 + rint(R, 4), made = 0, guard = 0;
+  var tot = 0; MOVES.forEach(function (m) { tot += m.w; });
+  while (made < steps && guard++ < 400) {
+    var r = R() * tot, mv = MOVES[0];
+    for (var i = 0; i < MOVES.length; i++) { r -= MOVES[i].w; if (r <= 0) { mv = MOVES[i]; break; } }
+    var before = ctx.ops.length;
+    var line;
+    try { line = mv.go(ctx, R); } catch (e) { line = null; }
+    if (!line || ctx.ops.length === before) continue;
+    ctx.ops[ctx.ops.length - 1].text = line;
+    made++;
+  }
+  if (made < 3) return null;
+  if (verifyCtx(ctx)) return null;
+  var tg = chooseTarget(ctx, R);
+  if (!tg) return null;
+  if (tg.v.n <= 0n) return null;
+  if (tg.v.n + tg.v.d > 1200000n) return null;
+  var kept = prune(ctx, tg);
+  if (kept < 4) return null;
+  if (verifyCtx(ctx)) return null;
+  return { ctx: ctx, target: tg, seed: seed >>> 0, steps: kept };
+}
+
+/* ---------- presentation ---------- */
+function fs(f) { return GEO.fstr(f); }
+function coordStr(P) { return '(' + fs(P.x) + ', ' + fs(P.y) + ')'; }
+
+function figureOf(ctx, tg) {
+  var g = [], gp = function (n) { return nameP(ctx, n); };
+  var xy = function (e) { return [qnum(e.p.x), qnum(e.p.y)]; };
+  ctx.circs.forEach(function (ce, i) {
+    g.push({ t: 'circ', c: [qnum(ce.c.o.x), qnum(ce.c.o.y)], r: Math.sqrt(qnum(ce.c.r2)),
+             dash: i === 0 ? 0 : 1, k: i === 0 ? 'main' : 'aux' });
+  });
+  var A = gp('A'), B = gp('B'), C = gp('C');
+  g.push({ t: 'seg', p: xy(A), q: xy(B), k: 'main', dash: 0 });
+  g.push({ t: 'seg', p: xy(B), q: xy(C), k: 'main', dash: 0 });
+  g.push({ t: 'seg', p: xy(C), q: xy(A), k: 'main', dash: 0 });
+  ctx.ops.forEach(function (op) {
+    if (op.isCirc) return;
+    var X = gp(op.out);
+    if (!X) return;
+    var link = [];
+    if (op.id === 'meet') link = [op.a[0], op.a[1], op.a[2], op.a[3]];
+    else if (op.id === 'second' || op.id === 'mid' || op.id === 'reflP') link = [op.a[0], op.a[1]];
+    else if (op.id === 'foot' || op.id === 'reflL') link = [op.a[0]];
+    else if (op.id === 'tang') link = [op.a[0], op.a[1]];
+    else if (op.id === 'para' || op.id === 'perp') link = [op.a[3], op.a[4]];
+    link.forEach(function (n) {
+      var Y = gp(n);
+      if (Y) g.push({ t: 'seg', p: xy(X), q: xy(Y), k: 'aux', dash: 1 });
+    });
+  });
+  if (tg.kind === 'd2' && tg.pts) {
+    g.push({ t: 'seg', p: xy(gp(tg.pts[0])), q: xy(gp(tg.pts[1])), k: 'hi', dash: 0 });
+  } else if (tg.kind === 'area' && tg.pts) {
+    for (var i = 0; i < 3; i++)
+      g.push({ t: 'seg', p: xy(gp(tg.pts[i])), q: xy(gp(tg.pts[(i + 1) % 3])), k: 'hi', dash: 0 });
+  } else if (tg.kind === 'r2') {
+    var ce = nameC(ctx, tg.circ);
+    if (ce) g.push({ t: 'circ', c: [qnum(ce.c.o.x), qnum(ce.c.o.y)], r: Math.sqrt(qnum(ce.c.r2)), dash: 0, k: 'hi' });
+  }
+  ctx.pts.forEach(function (e) { g.push({ t: 'pt', p: xy(e), l: e.n }); });
+  return g;
+}
+
+function make(seed) {
+  if (seed === undefined) seed = (Math.random() * 4294967296) >>> 0;
+  for (var k = 0; k < 400; k++) {
+    var b = build((seed + k * 2654435761) >>> 0);
+    if (b) return present(b);
+  }
+  return null;
+}
+
+function present(b) {
+  var ctx = b.ctx, tg = b.target, f = ctx.f;
+  var notes = findNotes(ctx);
+  var v = tg.v, isInt = (v.d === 1n);
+  var answer = (isInt ? v.n : v.n + v.d).toString();
+  var nSteps = b.steps;
+
+  var statement = ctx.head + ' ' + ctx.ops.map(function (o) { return o.text; }).filter(Boolean).join(' ');
+
+  var hints = [];
+  hints.push('This triangle is Heronian, so set B = (0, 0), C = (' + f.a + ', 0) and A = ' +
+    coordStr(f.A) + '. Every point in the construction is then rational — coordinates will close it out.');
+  if (notes.length) {
+    hints.push('There is hidden structure here: <b>' + notes[0].s + '</b>. Spotting that is usually the short route.');
+  } else {
+    var mid = ctx.pts[3 + Math.floor((ctx.pts.length - 3) / 2)] || ctx.pts[3];
+    if (mid) hints.push('Work out ' + mid.n + ' first — it comes to ' + coordStr(mid.p) + '.');
+    else hints.push('Take the construction one step at a time and keep everything as exact fractions.');
+  }
+  var shown = ctx.pts.slice(3).filter(function (e) { return !tg.pts || tg.pts.indexOf(e.n) < 0; });
+  if (shown.length) {
+    hints.push('Intermediate coordinates: ' + shown.map(function (e) { return e.n + ' = ' + coordStr(e.p); }).join(', ') + '.');
+  } else {
+    hints.push('Every point is rational — push the fractions through without decimals and the answer drops out.');
+  }
+
+  var sol = '<p>This one is machine-generated, so there is no named lemma behind it — here is the verified coordinate computation. ' +
+    'Each step below was checked to satisfy its own definition exactly (in rational arithmetic, not floating point).</p>';
+  sol += '<p class="k">B = (0, 0)&nbsp; C = (' + f.a + ', 0)&nbsp; A = ' + coordStr(f.A) + '</p>';
+  sol += '<p>Carrying the construction through:</p><p class="k">' +
+    ctx.pts.slice(3).map(function (e) { return e.n + ' = ' + coordStr(e.p); }).join('<br>') + '</p>';
+  if (ctx.circs.length > 1) {
+    sol += '<p class="k">' + ctx.circs.map(function (ce) {
+      return ce.n + ': center ' + coordStr(ce.c.o) + ', r² = ' + fs(ce.c.r2);
+    }).join('<br>') + '</p>';
+  }
+  if (notes.length) {
+    sol += '<p><b>Worth spotting:</b> ' + notes.map(function (n) { return n.s; }).join('; ') +
+      '. A synthetic solution would almost certainly go through ' +
+      (notes[0].t === 'coll' ? 'that collinearity' : notes[0].t === 'cyc' ? 'those concyclic points' :
+       notes[0].t === 'on' ? 'that incidence' : 'that equality') + '.</p>';
+  }
+  sol += '<p>Finally</p><p class="k">' + tg.q + ' = ' + fs(v) +
+    (isInt ? '' : '&nbsp; →&nbsp; m + n = <b>' + answer + '</b>') + '</p>';
+
+  return {
+    cfgId: 'wild', name: 'Wild construction · ' + nSteps + ' steps',
+    lemma: notes.length
+      ? 'Machine-generated from a random chain of classical constructions. Hidden structure in this one: ' +
+        notes.map(function (n) { return n.s; }).join('; ') + '.'
+      : 'Machine-generated from a random chain of classical constructions over a Heronian triangle, so every point is rational and the answer is exact.',
+    tier: 4, topic: 'wild', seed: b.seed, params: { tri: [f.a, f.b, f.c] },
+    quantity: tg.q, statement: statement,
+    exact: fs(v), approx: qnum(v), isInt: isInt, answer: answer,
+    hints: hints, solution: sol, figure: figureOf(ctx, tg),
+    notes: notes.map(function (n) { return n.s; }), steps: nSteps
+  };
+}
+
+return {
+  make: make, build: build, heronList: heronList, verifyCtx: verifyCtx,
+  findNotes: findNotes, baseFrame: baseFrame,
+  _k: { pt: pt, dd: dd, circ3: circ3, secondOn: secondOn, poleOf: poleOf, collinear3: collinear3, qnum: qnum }
+};
+}));
+
+</script>
+<script>
+(function () {
+'use strict';
+var $ = function (id) { return document.getElementById(id); };
+
+/* ============ figure renderer ============ */
+function svgFor(prims) {
+  var W = 1000, H = 700, pad = 64;
+  var x0 = 1e18, x1 = -1e18, y0 = 1e18, y1 = -1e18;
+  function add(x, y) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  prims.forEach(function (o) {
+    if (o.t === 'pt') add(o.p[0], o.p[1]);
+    else if (o.t === 'seg') { add(o.p[0], o.p[1]); add(o.q[0], o.q[1]); }
+    else if (o.t === 'circ') { add(o.c[0] - o.r, o.c[1] - o.r); add(o.c[0] + o.r, o.c[1] + o.r); }
+  });
+  var bw = Math.max(x1 - x0, 1e-6), bh = Math.max(y1 - y0, 1e-6);
+  var sc = Math.min((W - 2 * pad) / bw, (H - 2 * pad) / bh);
+  var px = (W - bw * sc) / 2, py = (H - bh * sc) / 2;
+  function m(p) { return [(p[0] - x0) * sc + px, (y1 - p[1]) * sc + py]; }
+  var pts = prims.filter(function (o) { return o.t === 'pt'; });
+  var cx = 0, cy = 0;
+  pts.forEach(function (o) { cx += o.p[0]; cy += o.p[1]; });
+  if (pts.length) { cx /= pts.length; cy /= pts.length; }
+
+  var out = [], dots = [], labs = [];
+  prims.forEach(function (o) {
+    if (o.t === 'circ') {
+      var c = m(o.c), cls = o.dash ? 'fig-circ-dash' : (o.k === 'hi' ? 'fig-circ-hi' : 'fig-circ');
+      out.push('<circle cx="' + c[0].toFixed(1) + '" cy="' + c[1].toFixed(1) + '" r="' + (o.r * sc).toFixed(1) + '" class="' + cls + '"/>');
+    } else if (o.t === 'seg') {
+      var a = m(o.p), b = m(o.q);
+      var cl = o.dash ? 'fig-dash' : (o.k === 'hi' ? 'fig-hi' : (o.k === 'main' ? 'fig-main' : 'fig-aux'));
+      out.push('<line x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) + '" x2="' + b[0].toFixed(1) + '" y2="' + b[1].toFixed(1) + '" class="' + cl + '"/>');
+    } else if (o.t === 'pt') {
+      var q = m(o.p);
+      dots.push('<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="5.6" class="fig-dot"/>');
+      var dx = o.p[0] - cx, dy = o.p[1] - cy, L = Math.hypot(dx, dy);
+      if (L < 1e-9) { dx = 0; dy = 1; L = 1; }
+      dx /= L; dy /= L;
+      var lx = q[0] + dx * 26, ly = q[1] - dy * 26 + 7;
+      var anchor = dx > 0.35 ? 'start' : (dx < -0.35 ? 'end' : 'middle');
+      var parts = String(o.l).split('_');
+      var txt = esc(parts[0]) + (parts[1] ? '<tspan font-size="14" dy="5">' + esc(parts[1]) + '</tspan>' : '');
+      labs.push('<text x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '" text-anchor="' + anchor + '" class="fig-lab">' + txt + '</text>');
+    }
+  });
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Figure for the problem">' +
+    out.join('') + dots.join('') + labs.join('') + '</svg>';
+}
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+/* ============ storage ============ */
+var KEY = 'sgd.v1';
+var DB = { stats: {}, streak: 0, best: 0, total: 0, correct: 0,
+  opts: { adaptive: true, name: false, fig: true, topic: 'all', tier: 'all', custom: null } };
+try {
+  var raw = localStorage.getItem(KEY);
+  if (raw) { var o = JSON.parse(raw); if (o && o.stats) { DB = o; DB.opts = DB.opts || {}; } }
+} catch (e) {}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e) {} }
+function st(id) { return DB.stats[id] || (DB.stats[id] = { seen: 0, right: 0, time: 0 }); }
+
+/* ============ problem state ============ */
+var cur = null, scored = false, done = false, hintsUp = 0, t0 = 0, tick = null;
+
+function activeIds() {
+  if (DB.opts.custom && DB.opts.custom.length) return DB.opts.custom.slice();
+  if (DB.opts.tier === '4') return ['wild'];
+  return GEO.CONFIGS.filter(function (c) {
+    return (DB.opts.topic === 'all' || c.topic === DB.opts.topic) &&
+           (DB.opts.tier === 'all' || c.tier === +DB.opts.tier);
+  }).map(function (c) { return c.id; });
+}
+function weightOf(id) {
+  var s = DB.stats[id];
+  if (!s || s.seen === 0) return 3.2;
+  var acc = s.right / s.seen;
+  return 1 + 3 * (1 - acc) + (s.seen < 3 ? 1.4 : 0);
+}
+function pickId(ids) {
+  if (ids.length === 1) return ids[0];
+  var pool = ids.filter(function (i) { return !cur || i !== cur.cfgId; });
+  if (!pool.length) pool = ids;
+  if (!DB.opts.adaptive) return pool[Math.floor(Math.random() * pool.length)];
+  var tot = 0, w = pool.map(function (i) { var x = weightOf(i); tot += x; return x; });
+  var r = Math.random() * tot;
+  for (var k = 0; k < pool.length; k++) { r -= w[k]; if (r <= 0) return pool[k]; }
+  return pool[pool.length - 1];
+}
+
+function newProblem() {
+  var ids = activeIds();
+  if (!ids.length) { DB.opts.topic = 'all'; DB.opts.tier = 'all'; ids = activeIds(); }
+  var id = pickId(ids);
+  cur = (id === 'wild') ? WILD.make() : GEO.makeProblem(id, (Math.random() * 4294967296) >>> 0);
+  if (!cur) cur = GEO.randomProblem();
+  scored = false; done = false; hintsUp = 0;
+  drawProblem();
+  startClock();
+}
+
+function drawProblem() {
+  var p = cur, cfg = GEO.byId(p.cfgId);
+  $('pTier').className = 'tier t' + p.tier;
+  $('pTier').textContent = GEO.TIERS[p.tier];
+  $('pTopic').textContent = GEO.TOPICS[p.topic] || 'Machine-generated construction';
+  $('pStmt').innerHTML = p.statement;
+  $('pAsk').innerHTML = p.isInt
+    ? 'Find <b>' + p.quantity + '</b>.'
+    : '<b>' + p.quantity + '</b> can be written as m/n, where m and n are relatively prime positive integers. Find <b>m + n</b>.';
+  $('pFig').innerHTML = svgFor(p.figure);
+  $('plate').hidden = !DB.opts.fig;
+  $('figBtn').textContent = DB.opts.fig ? 'hide' : 'show';
+  $('pNamed').hidden = !DB.opts.name;
+  $('pNamedT').innerHTML = p.name;
+  $('pNamedL').innerHTML = p.lemmaPre || p.lemma;
+  $('ans').value = ''; $('ans').disabled = false;
+  $('checkBtn').disabled = false;
+  $('verdict').hidden = true;
+  $('hints').innerHTML = '';
+  $('sol').hidden = true;
+  $('hintBtn').disabled = false;
+  $('hintBtn').textContent = 'Hint 1 of ' + p.hints.length;
+  $('solBtn').textContent = 'Solution';
+  $('newBtn').className = 'btn';
+  $('checkBtn').className = 'btn primary';
+}
+
+function startClock() {
+  t0 = Date.now();
+  if (tick) clearInterval(tick);
+  $('pClock').textContent = '0:00';
+  tick = setInterval(function () {
+    var s = Math.floor((Date.now() - t0) / 1000);
+    $('pClock').textContent = Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
+  }, 1000);
+}
+function stopClock() { if (tick) { clearInterval(tick); tick = null; } return Math.round((Date.now() - t0) / 1000); }
+
+function record(ok) {
+  var s = st(cur.cfgId);
+  s.seen++; if (ok) s.right++;
+  s.time += Math.min(stopClock(), 1800);
+  DB.total++;
+  if (ok) { DB.correct++; DB.streak++; if (DB.streak > DB.best) DB.best = DB.streak; }
+  else DB.streak = 0;
+  save();
+}
+
+function finish() {
+  done = true;
+  $('ans').disabled = true; $('checkBtn').disabled = true;
+  $('checkBtn').className = 'btn';
+  $('newBtn').className = 'btn primary';
+  $('pNamed').hidden = false;
+  $('pNamedT').innerHTML = cur.name;
+  $('pNamedL').innerHTML = cur.lemma;
+}
+
+function check(e) {
+  if (e) e.preventDefault();
+  if (done) { newProblem(); return; }
+  var v = $('ans').value.replace(/[^0-9]/g, '');
+  if (!v) { $('ans').focus(); return; }
+  var ok = (v.replace(/^0+(?=\d)/, '') === cur.answer);
+  if (!scored) { scored = true; record(ok); }
+  var vd = $('verdict'); vd.hidden = false;
+  if (ok) {
+    vd.className = 'verdict good';
+    vd.innerHTML = 'Correct. <span class="val">' + cur.quantity + ' = ' + cur.exact + '</span>' +
+      '<span class="named">Streak: ' + DB.streak + '</span>';
+    finish();
+    $('newBtn').focus();
+  } else {
+    vd.className = 'verdict bad';
+    vd.innerHTML = 'That is not the answer. Try again, take a hint, or open the solution.';
+    $('ans').select();
+  }
+  renderProgress();
+}
+
+function showHint() {
+  if (hintsUp >= cur.hints.length) return;
+  var li = document.createElement('li');
+  li.innerHTML = cur.hints[hintsUp];
+  $('hints').appendChild(li);
+  hintsUp++;
+  if (hintsUp >= cur.hints.length) { $('hintBtn').disabled = true; $('hintBtn').textContent = 'No more hints'; }
+  else $('hintBtn').textContent = 'Hint ' + (hintsUp + 1) + ' of ' + cur.hints.length;
+}
+
+function showSolution() {
+  if (!scored) { scored = true; record(false); }
+  while (hintsUp < cur.hints.length) showHint();
+  $('solBody').innerHTML =
+    '<p class="k" style="border-left-color:var(--accent)">' + cur.quantity + ' = ' + cur.exact +
+    '&nbsp; &nbsp;→&nbsp; answer <b>' + cur.answer + '</b></p>' + cur.solution;
+  $('sol').hidden = false;
+  if (!done) finish();
+  renderProgress();
+}
+
+var WILDCFG = { id: 'wild', tier: 4, topic: 'wild',
+  name: 'Wild constructions (unlimited)',
+  lemma: 'Not a lemma \u2014 a generator. It chains plane triangle-and-circle constructions at random over a Heronian triangle, so every point stays rational and the answer is computed exactly. Its vocabulary: internal and external bisectors, medians (including where they meet the circumcircle), symmedians, isogonal conjugates, perpendicular feet, reflections, second intersections with a circle, circumcircles, tangent poles, radical axes and Miquel points. About two in five problems hide a coincidence \u2014 a collinearity, a concyclicity, an unexpected incidence, an equal pair \u2014 which is usually the short way in, and that is what the second hint tells you.' };
+
+/* ============ chips & filters ============ */
+function buildChips() {
+  var tc = $('topicChips'), tr = $('tierChips');
+  tc.innerHTML = ''; tr.innerHTML = '';
+  function mk(host, label, val, key) {
+    var b = document.createElement('button');
+    b.className = 'chip'; b.type = 'button'; b.textContent = label;
+    b.setAttribute('aria-pressed', String(DB.opts[key] === val));
+    b.onclick = function () { DB.opts[key] = val; DB.opts.custom = null; save(); buildChips(); setLabel(); newProblem(); };
+    host.appendChild(b);
+  }
+  mk(tc, 'All', 'all', 'topic');
+  Object.keys(GEO.TOPICS).forEach(function (k) { mk(tc, GEO.TOPICS[k], k, 'topic'); });
+  mk(tr, 'All', 'all', 'tier');
+  [1, 2, 3, 4].forEach(function (t) { mk(tr, GEO.TIERS[t], String(t), 'tier'); });
+}
+function setLabel() {
+  var ids = activeIds(), n = ids.length;
+  var nm;
+  if (DB.opts.custom && DB.opts.custom.length) {
+    nm = n === 1 ? ((ids[0] === 'wild' ? WILDCFG : GEO.byId(ids[0])).name.replace(/<[^>]+>/g, '')) : n + ' selected configurations';
+  } else if (DB.opts.tier === '4') nm = 'Wild constructions \u2014 unlimited';
+  else if (DB.opts.topic === 'all' && DB.opts.tier === 'all') nm = 'All ' + n + ' lemmas';
+  else {
+    var bits = [];
+    if (DB.opts.topic !== 'all') bits.push(GEO.TOPICS[DB.opts.topic]);
+    if (DB.opts.tier !== 'all') bits.push(GEO.TIERS[DB.opts.tier] + ' level');
+    nm = bits.join(' · ') + ' (' + n + ')';
+  }
+  $('setName').textContent = nm;
+  $('setMeta').textContent = DB.opts.adaptive ? '· adaptive' : '';
+  $('setMeta').style.color = 'var(--muted)';
+  $('setMeta').style.fontSize = '12px';
+}
+
+/* ============ progress view ============ */
+function fmtTime(s) { return Math.floor(s / 60) + ':' + ('0' + Math.round(s % 60)).slice(-2); }
+function renderProgress() {
+  $('sAtt').textContent = DB.total;
+  $('sAcc').textContent = DB.total ? Math.round(100 * DB.correct / DB.total) + '%' : '—';
+  $('sStreak').textContent = DB.streak;
+  $('sBest').textContent = DB.best;
+  var all = GEO.CONFIGS.concat([WILDCFG]);
+  var rows = all.map(function (c) {
+    var s = DB.stats[c.id] || { seen: 0, right: 0, time: 0 };
+    return { c: c, s: s, acc: s.seen ? s.right / s.seen : -1 };
+  });
+  rows.sort(function (a, b) {
+    if (a.acc < 0 && b.acc < 0) return 0;
+    if (a.acc < 0) return 1; if (b.acc < 0) return -1;
+    if (a.acc !== b.acc) return a.acc - b.acc;
+    return b.s.seen - a.s.seen;
+  });
+  var host = $('progRows'); host.innerHTML = '';
+  rows.forEach(function (r) {
+    var b = document.createElement('button');
+    b.className = 'row' + (r.acc < 0 ? ' untried' : (r.acc < 0.5 ? ' weak' : (r.acc >= 0.8 ? ' strong' : '')));
+    var pct = r.acc < 0 ? 0 : Math.round(100 * r.acc);
+    b.innerHTML = '<span class="nm">' + r.c.name + '</span>' +
+      '<span class="sc">' + (r.acc < 0 ? 'not tried' : r.s.right + '/' + r.s.seen + ' · ' + pct + '%') + '</span>' +
+      '<span class="bar"><i style="width:' + pct + '%"></i></span>' +
+      '<span class="meta">' + GEO.TIERS[r.c.tier].toUpperCase() + ' · ' + (GEO.TOPICS[r.c.topic] || 'Unlimited, machine-generated') +
+      (r.s.seen ? ' · avg ' + fmtTime(r.s.time / r.s.seen) : '') + '</span>';
+    b.onclick = function () { drillOnly([r.c.id]); };
+    host.appendChild(b);
+  });
+}
+function drillOnly(ids) {
+  DB.opts.custom = ids; save();
+  setLabel(); show('drill'); newProblem();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ============ lemma index ============ */
+function renderLemmas() {
+  var host = $('lemBody'); host.innerHTML = '';
+  Object.keys(GEO.TOPICS).forEach(function (k) {
+    var list = GEO.CONFIGS.filter(function (c) { return c.topic === k; });
+    if (!list.length) return;
+    var g = document.createElement('div'); g.className = 'group';
+    g.innerHTML = '<h3>' + GEO.TOPICS[k] + '</h3>';
+    list.sort(function (a, b) { return a.tier - b.tier; }).forEach(function (c) {
+      var d = document.createElement('div'); d.className = 'lem';
+      d.innerHTML = '<div class="hd"><span class="tier t' + c.tier + '">' + GEO.TIERS[c.tier] + '</span>' +
+        '<span class="nm">' + c.name + '</span></div><p>' + c.lemma + '</p>';
+      var btn = document.createElement('button');
+      btn.className = 'go'; btn.type = 'button'; btn.textContent = 'Drill this';
+      btn.onclick = function () { drillOnly([c.id]); };
+      d.appendChild(btn);
+      g.appendChild(d);
+    });
+    host.appendChild(g);
+  });
+  var g2 = document.createElement('div'); g2.className = 'group';
+  g2.innerHTML = '<h3>Unlimited</h3>';
+  var d2 = document.createElement('div'); d2.className = 'lem';
+  d2.innerHTML = '<div class="hd"><span class="tier t4">Wild</span><span class="nm">' + WILDCFG.name +
+    '</span></div><p>' + WILDCFG.lemma + '</p>';
+  var b2 = document.createElement('button');
+  b2.className = 'go'; b2.type = 'button'; b2.textContent = 'Drill this';
+  b2.onclick = function () { drillOnly(['wild']); };
+  d2.appendChild(b2); g2.appendChild(d2); host.appendChild(g2);
+}
+
+/* ============ views ============ */
+function show(v) {
+  ['drill', 'progress', 'lemmas'].forEach(function (k) {
+    $('view-' + k).hidden = (k !== v);
+    $('tab-' + k).setAttribute('aria-selected', String(k === v));
+  });
+  if (v === 'progress') renderProgress();
+}
+
+/* ============ wiring ============ */
+$('ansForm').addEventListener('submit', check);
+$('hintBtn').onclick = showHint;
+$('solBtn').onclick = showSolution;
+$('newBtn').onclick = function () { newProblem(); $('ans').focus(); };
+$('figBtn').onclick = function () { DB.opts.fig = !DB.opts.fig; save(); $('plate').hidden = !DB.opts.fig; $('figBtn').textContent = DB.opts.fig ? 'hide' : 'show'; };
+$('optAdaptive').onchange = function () { DB.opts.adaptive = this.checked; save(); setLabel(); };
+$('optName').onchange = function () { DB.opts.name = this.checked; save(); if (!done) { $('pNamed').hidden = !this.checked; } };
+$('tab-drill').onclick = function () { show('drill'); };
+$('tab-progress').onclick = function () { show('progress'); };
+$('tab-lemmas').onclick = function () { show('lemmas'); };
+$('weakBtn').onclick = function () {
+  var rows = GEO.CONFIGS.map(function (c) {
+    var s = DB.stats[c.id] || { seen: 0, right: 0 };
+    return { id: c.id, acc: s.seen ? s.right / s.seen : 2, seen: s.seen };
+  }).sort(function (a, b) { return a.acc - b.acc || b.seen - a.seen; });
+  drillOnly(rows.slice(0, 5).map(function (r) { return r.id; }));
+};
+$('resetBtn').onclick = function () {
+  DB.stats = {}; DB.streak = 0; DB.best = 0; DB.total = 0; DB.correct = 0; save(); renderProgress();
+};
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Enter' && done && document.activeElement !== $('ans')) { newProblem(); }
+});
+
+window.SGD = { get problem() { return cur; }, get data() { return DB; } };
+
+/* boot */
+if (DB.opts.adaptive === undefined) DB.opts.adaptive = true;
+if (DB.opts.fig === undefined) DB.opts.fig = true;
+$('optAdaptive').checked = !!DB.opts.adaptive;
+$('optName').checked = !!DB.opts.name;
+buildChips(); setLabel(); renderLemmas(); renderProgress(); newProblem();
+})();
+
+</script>
